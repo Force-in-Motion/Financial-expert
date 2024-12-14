@@ -11,7 +11,7 @@ class SaveLoadData:
         :return: Путь в виде строки
         """
         current_dir = os.path.dirname(__file__)
-        path_token = os.path.join(current_dir, '..', 'storage', 'config.json')
+        path_token = os.path.join(current_dir, '..', 'settings', 'token.json')
 
         return os.path.abspath(path_token)
 
