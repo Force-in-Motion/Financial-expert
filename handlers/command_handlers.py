@@ -4,7 +4,7 @@ from aiogram import Router, types
 from aiogram.filters import Command, CommandObject
 from aiogram import F
 
-from keyboards.keyboards import CreateKeyboard
+from keyboards.keyboards import CreateKeyboard as cb
 
 
 
@@ -25,7 +25,9 @@ async def start_handler(message: types.Message) -> None:
             '/add_expense [сумма] [категория] - Добавление расхода с указанием суммы и категории.\n\n'
             '/set_goal [сумма] [описание] - Установка финансовой цели с указанием суммы и описания.\n\n'
             '/view_transactions [период] - Просмотр истории транзакций за указанный период.\n\n'
+            '/view_categories - Просмотр доступных категорий, список категорий можно расширить\n\n'
             '/statistics - Просмотр статистики по расходам и доходам, а также прогрессу в достижении финансовых целей.\n\n'
             '/help - Список доступных команд и описание их использования.')
 
-    await message.answer(mess, reply_markup=CreateKeyboard.create_main_menu_btn())
+    await message.answer(mess, reply_markup=cb.create_main_menu_kb())
+
