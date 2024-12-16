@@ -1,8 +1,7 @@
-import aiogram
 import asyncio
 from aiogram import Bot,Dispatcher
 
-from handlers import command_handlers, callback_handlers, insert_state_handlers
+from handlers import command_handlers, goal_state_handlers, insert_state_handlers
 from service.service_data import SaveLoadData as sld
 
 
@@ -13,7 +12,7 @@ async def main() -> None:
 
     dp = Dispatcher()
 
-    dp.include_routers(command_handlers.router, state_handlers.router)
+    dp.include_routers(command_handlers.router, insert_state_handlers.router, goal_state_handlers.router)
 
     await bot.delete_webhook(drop_pending_updates=True)
 

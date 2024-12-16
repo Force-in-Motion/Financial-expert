@@ -3,9 +3,7 @@ from aiogram.filters import Command, StateFilter
 from aiogram import Router, types
 from aiogram import F
 
-from model.data_state import States
-from keyboards.keyboards import CreateKeyboard as cb
-from service.service_data import SaveLoadData as sld
+from model.states import States
 from model.db_operations import Income
 from model.db_operations import Expense
 
@@ -110,12 +108,6 @@ async def creating_finished_record_expense_handler(message: types.Message, state
     expense.add_expense(data)
     await message.answer('Ваши данные успешно сохранены')
     await state.clear()
-
-
-
-
-
-
 
 
 @router.message(StateFilter(States.category_income, States.category_expense, States.quantity_income, States.quantity_expense))

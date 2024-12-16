@@ -31,7 +31,7 @@ class Income:
 
         self.__cursor.execute(
         'INSERT INTO Income (quantity, category, date) VALUES (?, ?, ?)',
-  (value.get('quantity'), value.grt('category'), current_date)
+  (value.get('quantity'), value.get('category'), current_date)
         )
 
         self.__connect.commit()
@@ -74,15 +74,28 @@ class Goal:
     def __init__(self):
         self.__connect = sqlite3.connect(sld.get_db_path())
         self.__cursor = self.__connect.cursor()
+        self.__create_table_goal()
 
 
     def __create_table_goal(self):
         self.__cursor.execute("""
-        CREATE TABLE IF NOT EXISTS (
+        CREATE TABLE IF NOT EXISTS Goal (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        summa NOT NULL,
-        description NOT NULL
+        description TEXT NOT NULL,
+        deposit INTEGER NOT NULL,
+        date TEXT NOT NULL
         )
         """)
+
+    def add_goal(self, value) -> None:
+
+        current_date = datetime.now().strftime('%Y-%m-%d')
+
+        self.__cursor.execute(
+            'INSERT INTO Goal (description, deposit, date) VALUES (?, ?, ?)',
+      (value.get('description'), value.get('deposit'), current_date)
+        )
+
+        self.__connect.commit()
 
 

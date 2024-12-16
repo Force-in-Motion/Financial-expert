@@ -9,3 +9,6 @@ class States(StatesGroup):
 
     quantity_expense = State()
     category_expense = State()
+
+    description = State()
+    deposit = State()

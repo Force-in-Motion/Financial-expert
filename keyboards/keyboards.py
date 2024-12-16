@@ -12,7 +12,7 @@ class CreateKeyboard:
 
         builder.button(text='Добавить доход')
         builder.button(text='Добавить расход')
-        builder.button(text='Моя цель')
+        builder.button(text='Меню целей')
         builder.button(text='История транзакций')
         builder.button(text='Статистика')
 
@@ -30,18 +30,15 @@ class CreateKeyboard:
         return builder.as_markup(resize_keyboard=True)
 
 
-    # @staticmethod
-    # def create_category_kb():
-    #
-    #     builder = InlineKeyboardBuilder()
-    #
-    #     categories = sld.get_sample()
-    #
-    #     for elem in categories:
-    #
-    #         builder.button(text=elem, callback_data=elem)
-    #
-    #         builder.adjust(1)
-    #
-    #     return builder.as_markup(resize_keyboard=True)
+    @staticmethod
+    def create_menu_goal_kb():
+
+        builder = InlineKeyboardBuilder()
+
+        builder.button(text='Добавить цель', callback_data='add_goal')
+        builder.button(text='Мои цели', callback_data='my_goal')
+
+        builder.adjust(1)
+
+        return builder.as_markup(resize_keyboard=True)
 
