@@ -12,7 +12,7 @@ class CreateKeyboard:
 
         builder.button(text='Добавить доход')
         builder.button(text='Добавить расход')
-        builder.button(text='Определить цель')
+        builder.button(text='Моя цель')
         builder.button(text='История транзакций')
         builder.button(text='Статистика')
 

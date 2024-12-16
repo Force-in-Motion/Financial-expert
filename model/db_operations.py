@@ -30,13 +30,11 @@ class Income:
         current_date = datetime.now().strftime('%Y-%m-%d')
 
         self.__cursor.execute(
-        'INSERT INTO Income (quantity, category, date)'
-        ' VALUES (?, ?, ?)', (value['quantity'], value['category'], current_date)
+        'INSERT INTO Income (quantity, category, date) VALUES (?, ?, ?)',
+  (value.get('quantity'), value.grt('category'), current_date)
         )
 
         self.__connect.commit()
-
-
 
 
 
@@ -65,8 +63,26 @@ class Expense:
         current_date = datetime.now().strftime('%Y-%m-%d')
 
         self.__cursor.execute(
-        'INSERT INTO Expense (quantity, category, date)'
-        ' VALUES (?, ?, ?)', (value['quantity'], value['category'], current_date)
+        'INSERT INTO Expense (quantity, category, date) VALUES (?, ?, ?)',
+  (value.get('quantity'), value.get('category'), current_date)
         )
 
         self.__connect.commit()
+
+
+class Goal:
+    def __init__(self):
+        self.__connect = sqlite3.connect(sld.get_db_path())
+        self.__cursor = self.__connect.cursor()
+
+
+    def __create_table_goal(self):
+        self.__cursor.execute("""
+        CREATE TABLE IF NOT EXISTS (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        summa NOT NULL,
+        description NOT NULL
+        )
+        """)
+
+

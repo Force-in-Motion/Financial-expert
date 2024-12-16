@@ -2,7 +2,7 @@ import aiogram
 import asyncio
 from aiogram import Bot,Dispatcher
 
-from handlers import command_handlers, callback_handlers, state_handlers
+from handlers import command_handlers, callback_handlers, insert_state_handlers
 from service.service_data import SaveLoadData as sld
 
 

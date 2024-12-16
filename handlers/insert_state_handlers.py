@@ -36,7 +36,7 @@ async def input_category_income_handler(message: types.Message, state: FSMContex
     """
     if message.text.isdigit():
         await state.update_data(quantity=message.text)
-        await message.answer('Введите название категории категорию')
+        await message.answer('Введите название категории')
         await state.set_state(States.category_income)
     else:
         await message.reply('Введите число!')
@@ -86,8 +86,8 @@ async def input_category_expense_handler(message: types.Message, state: FSMConte
     """
     if message.text.isdigit():
         await state.update_data(quantity=message.text)
-        await message.answer('Введите название категории категорию')
-        await state.set_state(States.category_income)
+        await message.answer('Введите название категории')
+        await state.set_state(States.category_expense)
     else:
         await message.reply('Введите число!')
 
