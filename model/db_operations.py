@@ -93,9 +93,28 @@ class Goal:
 
         self.__cursor.execute(
             'INSERT INTO Goal (description, deposit, date) VALUES (?, ?, ?)',
-      (value.get('description'), value.get('deposit'), current_date)
+            (value.get('description'), value.get('deposit'), current_date)
         )
 
         self.__connect.commit()
+
+
+    def get_description_goal(self) -> list[str]:
+
+        self.__cursor.execute('SELECT description FROM Goal')
+
+        result = self.__cursor.fetchall()
+
+        descriptions = [elem[0] for elem in result]
+        print(descriptions)
+        return descriptions
+
+
+    # def add_deposit(self, value) -> None:
+    #
+    #     self.__cursor.execute(
+    #         'UPDATE Goal SET deposit = ? WHERE description = ?',
+    #         (value.get('description'), value.get('deposit'))
+
 
 
