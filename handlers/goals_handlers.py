@@ -171,9 +171,12 @@ async def active_goals_callback_handler(callback: types.CallbackQuery) -> None:
     await callback.message.answer(text='Статистика активных целей')
     await callback.message.delete()
     data = goal.get_all_data_goal()
-    for row in data:
-        await callback.message.answer(text=f'Цель накопления: {row[1]}\n Требуемая сумма: {row[2]}\n '
-        f'Накопления: {row[3]}\n Процент накопления: {row[3] / row[2] * 100}\n Остаток: {row[2] - row[3]}\n')
+    if data:
+        for row in data:
+            await callback.message.answer(text=f'Цель накопления: {row[1]}\n Требуемая сумма: {row[2]}\n '
+            f'Накопления: {row[3]}\n Процент накопления: {row[3] / row[2] * 100}\n Остаток: {row[2] - row[3]}\n')
+    else:
+        await callback.message.answer('Активные цели отсутствуют, для начала добавьте их')
 
 
 @router.callback_query(F.data == 'finished')
@@ -181,7 +184,9 @@ async def finished_goals_callback_handler(callback: types.CallbackQuery) -> None
     await callback.message.answer(text='Статистика завершенных целей')
     await callback.message.delete()
     data = goal.get_all_data_completed_goal()
-    for row in data:
-        await callback.message.answer(text=f'Цель накопления: {row[1]}\n Требуемая сумма: {row[2]}\n '
-        f'Накопления: {row[3]}\n Процент накопления: {row[3] / row[2] * 100}\n Остаток: {row[2] - row[3]}\n')
-
+    if data:
+        for row in data:
+            await callback.message.answer(text=f'Цель накопления: {row[1]}\n Требуемая сумма: {row[2]}\n '
+            f'Накопления: {row[3]}\n Процент накопления: {row[3] / row[2] * 100}\n Остаток: {row[2] - row[3]}\n')
+    else:
+        await callback.message.answer('Вы пока не завершили ни одной цели')

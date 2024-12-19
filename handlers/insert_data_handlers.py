@@ -110,17 +110,17 @@ async def creating_finished_record_expense_handler(message: types.Message, state
     await state.clear()
 
 
-@router.message(StateFilter(States.category_income, States.category_expense, States.quantity_income,
-                            States.quantity_expense, States.description, States.required, States.one_goal_menu,
-                            States.add_deposit))
-async def input_error_handler(message: types.Message, state: FSMContext) -> None:
-    """
-    Обрабатывает полученное сообщение пользователя и сообщает об ошибке ввода если получен не текст
-    :param message: Принимает текст сообщения, которое пользователь пишет в чат
-    :param state: Состояние, находясь в котором бот реагирует на команду пользователя
-    :return: None
-    """
-    await message.answer('Введите данные из предложенных!')
+# @router.message(StateFilter(States.category_income, States.category_expense, States.quantity_income,
+#                             States.quantity_expense, States.description, States.required, States.one_goal_menu,
+#                             States.add_deposit, None))
+# async def input_error_handler(message: types.Message, state: FSMContext) -> None:
+#     """
+#     Обрабатывает полученное сообщение пользователя и сообщает об ошибке ввода если получен не текст
+#     :param message: Принимает текст сообщения, которое пользователь пишет в чат
+#     :param state: Состояние, находясь в котором бот реагирует на команду пользователя
+#     :return: None
+#     """
+#     await message.answer('Введите данные из предложенных!')
 
 
 
