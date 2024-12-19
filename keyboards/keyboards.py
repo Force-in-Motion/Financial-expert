@@ -16,17 +16,9 @@ class CreateKeyboard:
         builder.button(text='Меню целей')
         builder.button(text='История транзакций')
         builder.button(text='Статистика')
-
-        builder.adjust(2, 1, 2)
-
-        return builder.as_markup(resize_keyboard=True)
-
-
-    @staticmethod
-    def help_btn():
-        builder = ReplyKeyboardBuilder()
-
         builder.button(text='Помощь')
+
+        builder.adjust(2, 1, 2, 1)
 
         return builder.as_markup(resize_keyboard=True)
 
@@ -45,7 +37,7 @@ class CreateKeyboard:
 
 
     @staticmethod
-    def create_menu_my_goal_kb():
+    def create_menu_my_goals_kb():
 
         builder = InlineKeyboardBuilder()
 
@@ -70,5 +62,17 @@ class CreateKeyboard:
         builder.adjust(1)
 
         del goal
+
+        return builder.as_markup(resize_keyboard=True)
+
+
+    @staticmethod
+    def create_menu_one_goal():
+        builder = InlineKeyboardBuilder()
+
+        builder.button(text='Удалить цель', callback_data='del_goal')
+        builder.button(text='Добавить депозит', callback_data='add_deposit')
+
+        builder.adjust(1)
 
         return builder.as_markup(resize_keyboard=True)

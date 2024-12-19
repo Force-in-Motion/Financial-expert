@@ -1,3 +1,3 @@
 
 class ProcessingData:
-    pass
+    name_goal = None

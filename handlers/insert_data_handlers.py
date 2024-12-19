@@ -125,31 +125,3 @@ async def input_error_handler(message: types.Message, state: FSMContext) -> None
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# @router.callback_query(StateFilter(States.category), F.data.in_(sld.get_sample()))
-# async def push_category_income_handler(callback: types.CallbackQuery, state: FSMContext) -> None:
-#     await state.update_data(category=callback.data)
-#     get_data = await state.get_data()
-#     income.add_income(get_data)
-#     await callback.message.answer('Ваши данные успешно сохранены')
-#     await callback.answer()
-
-
-
-
-

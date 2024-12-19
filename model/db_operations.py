@@ -70,19 +70,36 @@ class Expense:
         self.__connect.commit()
 
 
+
+
 class Goal:
     def __init__(self):
         self.__connect = sqlite3.connect(sld.get_db_path())
         self.__cursor = self.__connect.cursor()
         self.__create_table_goal()
+        self.__create_table_completed_goal()
+
+    def __create_table_completed_goal(self) -> None:
+
+        self.__cursor.execute("""
+        CREATE TABLE IF NOT EXISTS Completed_Goal (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        description TEXT NOT NULL,
+        required INTEGER NOT NULL,
+        deposit INTEGER,
+        date TEXT NOT NULL
+        )
+        """)
 
 
-    def __create_table_goal(self):
+    def __create_table_goal(self) -> None:
+
         self.__cursor.execute("""
         CREATE TABLE IF NOT EXISTS Goal (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         description TEXT NOT NULL,
-        deposit INTEGER NOT NULL,
+        required INTEGER NOT NULL,
+        deposit INTEGER,
         date TEXT NOT NULL
         )
         """)
@@ -92,9 +109,40 @@ class Goal:
         current_date = datetime.now().strftime('%Y-%m-%d')
 
         self.__cursor.execute(
-            'INSERT INTO Goal (description, deposit, date) VALUES (?, ?, ?)',
-            (value.get('description'), value.get('deposit'), current_date)
+            'INSERT INTO Goal (description, required, date) VALUES (?, ?, ?)',
+            (value.get('description'), value.get('required'), current_date)
         )
+
+        self.__connect.commit()
+
+
+    def add_deposit(self, value) -> None:
+
+        self.__cursor.execute('SELECT deposit FROM Goal WHERE description = ?',
+                              (value.get('description'),))
+        result = self.__cursor.fetchone()
+
+        if result[0] is not None:
+
+            new_deposit = result[0] + int(value.get('deposit'))
+
+            self.__cursor.execute(
+                'UPDATE Goal SET deposit = ? WHERE description = ?',
+                (new_deposit, value.get('description')))
+
+            self.__connect.commit()
+
+        else:
+            self.__cursor.execute(
+                'UPDATE Goal SET deposit = ? WHERE description = ?',
+                (value.get('deposit'), value.get('description')))
+
+            self.__connect.commit()
+
+
+    def del_goal(self, value) -> None:
+
+        self.__cursor.execute('DELETE FROM Goal WHERE description = ?', (value.get('description'),))
 
         self.__connect.commit()
 
@@ -106,15 +154,41 @@ class Goal:
         result = self.__cursor.fetchall()
 
         descriptions = [elem[0] for elem in result]
-        print(descriptions)
+
         return descriptions
 
 
-    # def add_deposit(self, value) -> None:
-    #
-    #     self.__cursor.execute(
-    #         'UPDATE Goal SET deposit = ? WHERE description = ?',
-    #         (value.get('description'), value.get('deposit'))
+    def check_accumulation(self, value) -> bool:
 
+        self.__cursor.execute('SELECT deposit, required FROM Goal WHERE description = ?', (value.get('description'),))
+
+        result = self.__cursor.fetchone()
+
+        if result[0] >= result[1]:
+
+            return True
+
+        return False
+
+
+    def get_all_data_goal(self, value):
+
+        self.__cursor.execute('SELECT * FROM Goal WHERE description = ?', (value.get('description'),))
+
+        result = self.__cursor.fetchone()
+
+        return result
+
+
+    def transfers_in_completed_goals(self, value) -> None:
+
+        data_goal = self.get_all_data_goal(value)
+
+        self.__cursor.execute(
+            'INSERT INTO Completed_Goal (description, required, deposit, date) VALUES (?, ?, ?, ?)',
+            (data_goal[1], data_goal[2], data_goal[3], data_goal[4])
+        )
+
+        self.__connect.commit()
 
 

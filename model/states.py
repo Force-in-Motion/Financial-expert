@@ -12,3 +12,7 @@ class States(StatesGroup):
 
     description = State()
     deposit = State()
+
+    one_goal_menu = State()
+    add_deposit = State()
+
