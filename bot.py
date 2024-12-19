@@ -12,7 +12,7 @@ async def main() -> None:
 
     dp = Dispatcher()
 
-    dp.include_routers(command_handlers.router, insert_state_handlers.router, goal_state_handlers.router)
+    dp.include_routers(command_handlers.router, insert_data_handlers.router, goals_handlers.router)
 
     await bot.delete_webhook(drop_pending_updates=True)
 

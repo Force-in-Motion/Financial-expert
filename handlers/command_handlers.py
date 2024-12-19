@@ -1,7 +1,6 @@
-import aiogram
-import asyncio
+
 from aiogram import Router, types
-from aiogram.filters import Command, CommandObject
+from aiogram.filters import Command
 from aiogram import F
 
 from keyboards.keyboards import CreateKeyboard as kb

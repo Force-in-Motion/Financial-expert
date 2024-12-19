@@ -42,7 +42,7 @@ class CreateKeyboard:
         builder = InlineKeyboardBuilder()
 
         builder.button(text='Список целей', callback_data='list_goal')
-        builder.button(text='Показать статистику', callback_data='add_deposit')
+        builder.button(text='Показать статистику', callback_data='statistic')
 
         builder.adjust(1)
 
@@ -55,7 +55,7 @@ class CreateKeyboard:
 
         builder = InlineKeyboardBuilder()
 
-        for elem in goal.get_description_goal():
+        for elem in goal.get_all_description_goal():
 
             builder.button(text=elem, callback_data=elem)
 
@@ -72,6 +72,18 @@ class CreateKeyboard:
 
         builder.button(text='Удалить цель', callback_data='del_goal')
         builder.button(text='Добавить депозит', callback_data='add_deposit')
+
+        builder.adjust(1)
+
+        return builder.as_markup(resize_keyboard=True)
+
+
+    @staticmethod
+    def create_main_menu_statistic_goals():
+        builder = InlineKeyboardBuilder()
+
+        builder.button(text='Активные цели', callback_data='active')
+        builder.button(text='Завершенные цели', callback_data='finished')
 
         builder.adjust(1)
 

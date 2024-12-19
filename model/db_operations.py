@@ -99,7 +99,7 @@ class Goal:
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         description TEXT NOT NULL,
         required INTEGER NOT NULL,
-        deposit INTEGER,
+        deposit INTEGER DEFAULT 0,
         date TEXT NOT NULL
         )
         """)
@@ -122,22 +122,13 @@ class Goal:
                               (value.get('description'),))
         result = self.__cursor.fetchone()
 
-        if result[0] is not None:
+        new_deposit = result[0] + int(value.get('deposit'))
 
-            new_deposit = result[0] + int(value.get('deposit'))
+        self.__cursor.execute(
+            'UPDATE Goal SET deposit = ? WHERE description = ?',
+            (new_deposit, value.get('description')))
 
-            self.__cursor.execute(
-                'UPDATE Goal SET deposit = ? WHERE description = ?',
-                (new_deposit, value.get('description')))
-
-            self.__connect.commit()
-
-        else:
-            self.__cursor.execute(
-                'UPDATE Goal SET deposit = ? WHERE description = ?',
-                (value.get('deposit'), value.get('description')))
-
-            self.__connect.commit()
+        self.__connect.commit()
 
 
     def del_goal(self, value) -> None:
@@ -147,7 +138,7 @@ class Goal:
         self.__connect.commit()
 
 
-    def get_description_goal(self) -> list[str]:
+    def get_all_description_goal(self) -> list[str]:
 
         self.__cursor.execute('SELECT description FROM Goal')
 
@@ -171,7 +162,7 @@ class Goal:
         return False
 
 
-    def get_all_data_goal(self, value):
+    def get_data_goal_from_description(self, value):
 
         self.__cursor.execute('SELECT * FROM Goal WHERE description = ?', (value.get('description'),))
 
@@ -180,9 +171,27 @@ class Goal:
         return result
 
 
+    def get_all_data_goal(self):
+
+        self.__cursor.execute('SELECT * FROM Goal')
+
+        result = self.__cursor.fetchall()
+
+        return result
+
+
+    def get_all_data_completed_goal(self):
+
+        self.__cursor.execute('SELECT * FROM Completed_Goal')
+
+        result = self.__cursor.fetchall()
+
+        return result
+
+
     def transfers_in_completed_goals(self, value) -> None:
 
-        data_goal = self.get_all_data_goal(value)
+        data_goal = self.get_data_goal_from_description(value)
 
         self.__cursor.execute(
             'INSERT INTO Completed_Goal (description, required, deposit, date) VALUES (?, ?, ?, ?)',

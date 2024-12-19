@@ -110,7 +110,9 @@ async def creating_finished_record_expense_handler(message: types.Message, state
     await state.clear()
 
 
-@router.message(StateFilter(States.category_income, States.category_expense, States.quantity_income, States.quantity_expense))
+@router.message(StateFilter(States.category_income, States.category_expense, States.quantity_income,
+                            States.quantity_expense, States.description, States.required, States.one_goal_menu,
+                            States.add_deposit))
 async def input_error_handler(message: types.Message, state: FSMContext) -> None:
     """
     Обрабатывает полученное сообщение пользователя и сообщает об ошибке ввода если получен не текст

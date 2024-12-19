@@ -11,7 +11,7 @@ class States(StatesGroup):
     category_expense = State()
 
     description = State()
-    deposit = State()
+    required = State()
 
     one_goal_menu = State()
     add_deposit = State()
