@@ -4,6 +4,78 @@ from service.service_data import SaveLoadData as sld
 
 
 
+class Users:
+    def __init__(self):
+        self.__connect = sqlite3.connect(sld.get_db_path())
+        self.__cursor = self.__connect.cursor()
+        self.__create_table_users()
+
+
+    def __create_table_users(self):
+
+        self.__cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS Users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            username TEXT NOT NULL,
+            password TEXT NOT NULL
+            )
+            """)
+
+    def add_user(self, value) -> None:
+
+        self.__cursor.execute(
+            'INSERT INTO Users (user_id, username, password) VALUES (?, ?, ?)',
+            (value.get('user_id'), value.get('username'), value.get('password'))
+        )
+
+        self.__connect.commit()
+
+
+    def authorization_user(self, value) -> bool:
+
+        self.__cursor.execute(
+            'SELECT username, password FROM Users WHERE username = ? AND password = ?',
+            (value.get('username'), value.get('password'))
+        )
+
+        result = self.__cursor.fetchone()
+
+        if result:
+            return True
+        return False
+
+
+    def edit_user_name(self, value) -> None:
+
+        self.__cursor.execute(
+            'UPDATE Users SET username = ? WHERE user_id = ?',
+            (value.get('username'), value.get('user_id'))
+        )
+
+        self.__connect.commit()
+
+
+    def edit_user_password(self, value) -> None:
+
+        self.__cursor.execute(
+            'UPDATE Users SET password = ? WHERE user_id = ?',
+            (value.get('password'), value.get('user_id'))
+        )
+
+        self.__connect.commit()
+
+
+    def del_user(self, value) -> None:
+
+        self.__cursor.execute('DELETE FROM Users WHERE user_id = ?', (value.get('user_id'),))
+
+        self.__connect.commit()
+
+
+
+
 class Income:
     def __init__(self):
         self.__connect = sqlite3.connect(sld.get_db_path())
@@ -16,9 +88,11 @@ class Income:
         self.__cursor.execute("""
         CREATE TABLE IF NOT EXISTS Income (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
         quantity INTEGER  NOT NULL,
         category TEXT NOT NULL,
-        date TEXT NOT NULL
+        date TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (user_id)
         )
         """)
 
@@ -31,7 +105,7 @@ class Income:
 
         self.__cursor.execute(
         'INSERT INTO Income (quantity, category, date) VALUES (?, ?, ?)',
-  (value.get('quantity'), value.get('category'), current_date)
+        (value.get('quantity'), value.get('category'), current_date)
         )
 
         self.__connect.commit()
@@ -46,12 +120,15 @@ class Expense:
 
 
     def __create_table_expense(self) -> None:
+
         self.__cursor.execute("""
         CREATE TABLE IF NOT EXISTS Expense (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
         quantity INTEGER  NOT NULL,
         category TEXT NOT NULL,
-        date TEXT NOT NULL
+        date TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES Users (user_id)
         )
         """)
 
@@ -84,10 +161,12 @@ class Goal:
         self.__cursor.execute("""
         CREATE TABLE IF NOT EXISTS Completed_Goal (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
         description TEXT NOT NULL,
         required INTEGER NOT NULL,
         deposit INTEGER,
-        date TEXT NOT NULL
+        date TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES Users (user_id)
         )
         """)
 
@@ -97,10 +176,12 @@ class Goal:
         self.__cursor.execute("""
         CREATE TABLE IF NOT EXISTS Goal (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
         description TEXT NOT NULL,
         required INTEGER NOT NULL,
         deposit INTEGER DEFAULT 0,
-        date TEXT NOT NULL
+        date TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES Users (user_id)
         )
         """)
 

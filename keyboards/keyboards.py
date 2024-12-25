@@ -11,14 +11,30 @@ class CreateKeyboard:
 
         builder = ReplyKeyboardBuilder()
 
+        builder.button(text='Регистрация')
+        builder.button(text='Авторизация')
+        builder.button(text='Меню целей')
         builder.button(text='Добавить доход')
         builder.button(text='Добавить расход')
-        builder.button(text='Меню целей')
         builder.button(text='История транзакций')
+        builder.button(text='Редактировать пользователя')
         builder.button(text='Статистика')
         builder.button(text='Помощь')
 
-        builder.adjust(2, 1, 2, 1)
+        builder.adjust(2, 1, 2, 2, 1, 1)
+
+        return builder.as_markup(resize_keyboard=True)
+
+
+    @staticmethod
+    def create_process_user_data():
+        builder = InlineKeyboardBuilder()
+
+        builder.button(text='Редактировать имя ', callback_data='username')
+        builder.button(text='Редактировать пароль', callback_data='username')
+        builder.button(text='Удалить пользователя', callback_data='username')
+
+        builder.adjust(1)
 
         return builder.as_markup(resize_keyboard=True)
 

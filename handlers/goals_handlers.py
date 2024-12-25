@@ -48,7 +48,7 @@ async def add_description_goal_handler(message: types.Message, state: FSMContext
 
 
 @router.message(StateFilter(States.required), F.text)
-async def add_required_goal_handler(message: types.Message, state: FSMContext) -> None:
+async def creating_finished_record_goal_handler(message: types.Message, state: FSMContext) -> None:
     """
     Обрабатывает полученное сообщение пользователя, записывает в стейт и затем извлекает из стейта
     :param message: Принимает текст сообщения, которое пользователь пишет в чат
