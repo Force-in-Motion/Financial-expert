@@ -5,23 +5,33 @@ from model.db_operations import Goal
 
 class CreateKeyboard:
 
+    @staticmethod
+    def create_enter_menu_kb():
+
+        builder = ReplyKeyboardBuilder()
+
+        builder.button(text='Регистрация')
+        builder.button(text='Авторизация')
+
+        builder.adjust(2)
+
+        return builder.as_markup(resize_keyboard=True)
+
 
     @staticmethod
     def create_main_menu_kb():
 
         builder = ReplyKeyboardBuilder()
 
-        builder.button(text='Регистрация')
-        builder.button(text='Авторизация')
         builder.button(text='Меню целей')
         builder.button(text='Добавить доход')
         builder.button(text='Добавить расход')
         builder.button(text='История транзакций')
-        builder.button(text='Редактировать пользователя')
         builder.button(text='Статистика')
+        builder.button(text='Редактировать пользователя')
         builder.button(text='Помощь')
 
-        builder.adjust(2, 1, 2, 2, 1, 1)
+        builder.adjust(1, 2, 2, 1, 1, )
 
         return builder.as_markup(resize_keyboard=True)
 

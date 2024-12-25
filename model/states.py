@@ -10,8 +10,12 @@ class States(StatesGroup):
     enter_username = State()
     enter_password = State()
 
-    edit_username = State()
-    edit_password = State()
+    old_username = State()
+    new_username = State()
+
+    old_password = State()
+    new_password = State()
+
     del_username = State()
 
     quantity_income = State()

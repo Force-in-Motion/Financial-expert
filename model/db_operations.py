@@ -43,15 +43,33 @@ class Users:
         result = self.__cursor.fetchone()
 
         if result:
+
             return True
+
+        return False
+
+
+    def get_user_name(self, old_name, user_id) -> bool:
+
+        self.__cursor.execute(
+            'SELECT username FROM Users WHERE username = ? AND user_id = ?',
+            (old_name, user_id)
+        )
+
+        result = self.__cursor.fetchone()
+
+        if result:
+
+            return True
+
         return False
 
 
     def edit_user_name(self, value) -> None:
 
         self.__cursor.execute(
-            'UPDATE Users SET username = ? WHERE user_id = ?',
-            (value.get('username'), value.get('user_id'))
+            'UPDATE Users SET username = ? WHERE username = ? AND user_id = ?',
+            (value.get('newname'), value.get('oldname'), value.get('user_id'))
         )
 
         self.__connect.commit()
@@ -60,7 +78,7 @@ class Users:
     def edit_user_password(self, value) -> None:
 
         self.__cursor.execute(
-            'UPDATE Users SET password = ? WHERE user_id = ?',
+            'UPDATE Users SET password = ? WHERE password = ? AND user_id = ?',
             (value.get('password'), value.get('user_id'))
         )
 

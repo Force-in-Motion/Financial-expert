@@ -2,18 +2,18 @@ from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command, StateFilter
 from aiogram import Router, types
 from aiogram import F
-from jinja2.async_utils import auto_await
 
 from model.states import States
 from model.db_operations import Users
 from keyboards.keyboards import CreateKeyboard as kb
+from utilits.processing_data import ProcessingData as pd
 
 router = Router()
 users = Users()
 
 @router.message(F.text.lower() == 'регистрация')
 @router.message(StateFilter(None), Command('register'))
-async def register_user_name_handler(message: types.Message, state: FSMContext) -> None:
+async def register_handler(message: types.Message, state: FSMContext) -> None:
     """
     Обрабатывает команду регистрации нового пользователя, запрашивает логин, меняет стейт на новый
     :param message: Принимает сообщение пользователя
@@ -26,7 +26,7 @@ async def register_user_name_handler(message: types.Message, state: FSMContext) 
 
 
 @router.message(StateFilter(States.add_username), F.text)
-async def register_password_handler(message: types.Message, state: FSMContext) -> None:
+async def input_user_name_handler(message: types.Message, state: FSMContext) -> None:
     """
     Обрабатывает команду регистрации нового пользователяб Запрашивает пароль,
     обрабатывает полученное сообщение пользователя, записывает в стейт и меняет стейт на новый
@@ -34,13 +34,16 @@ async def register_password_handler(message: types.Message, state: FSMContext) -
     :param state: Принимает состояние
     :return: None
     """
-    await state.update_data(username=message.text)
-    await message.answer('Введите пароль')
-    await state.set_state(States.add_password)
+    if not users.get_user_name(message.text, message.from_user.id):
+        await state.update_data(username=message.text)
+        await message.answer('Введите пароль')
+        await state.set_state(States.add_password)
+    else:
+        await message.answer('Такое имя пользователя уже существует')
 
 
 @router.message(StateFilter(States.add_password), F.text)
-async def creating_finished_register_handler(message: types.Message, state: FSMContext) -> None:
+async def input_password_handler(message: types.Message, state: FSMContext) -> None:
     """
     Обрабатывает полученное сообщение пользователя, записывает в стейт и меняет стейт на новый
     :param message: Принимает сообщение пользователя
@@ -50,13 +53,14 @@ async def creating_finished_register_handler(message: types.Message, state: FSMC
     await state.update_data(password=message.text)
     data = await state.get_data()
     users.add_user(data)
-    await message.answer('Пользователь создан успешно', reply_markup=kb.create_main_menu_kb())
+    await message.answer('Пользователь создан успешно, теперь авторизуйтесь\n', reply_markup=kb.create_main_menu_kb())
     await state.clear()
+    await login_handler(message, state)
 
 
-@router.message(F.text.lower() == 'Авторизация')
+@router.message(F.text.lower() == 'авторизация')
 @router.message(StateFilter(None), Command('login'))
-async def enter_user_name_handler(message: types.Message, state: FSMContext) -> None:
+async def login_handler(message: types.Message, state: FSMContext) -> None:
     """
     Обрабатывает команду входа нового, запрашивает логин, меняет стейт на новый
     :param message: Принимает сообщение пользователя
@@ -68,7 +72,7 @@ async def enter_user_name_handler(message: types.Message, state: FSMContext) -> 
 
 
 @router.message(StateFilter(States.enter_username), F.text)
-async def enter_password_handler(message: types.Message, state: FSMContext) -> None:
+async def enter_user_name_handler(message: types.Message, state: FSMContext) -> None:
     """
     Обрабатывает команду входа нового, запрашивает пароль, меняет стейт на новый
     :param message: Принимает сообщение пользователя
@@ -81,7 +85,7 @@ async def enter_password_handler(message: types.Message, state: FSMContext) -> N
 
 
 @router.message(StateFilter(States.enter_password), F.text)
-async def creating_finished_data_login_handler(message: types.Message, state: FSMContext) -> None:
+async def enter_password_handler(message: types.Message, state: FSMContext) -> None:
     """
     Обрабатывает полученное сообщение пользователя, записывает в стейт и меняет стейт на новый
     :param message: Принимает сообщение пользователя
@@ -91,31 +95,66 @@ async def creating_finished_data_login_handler(message: types.Message, state: FS
     await state.update_data(password=message.text)
     data = await state.get_data()
     if users.authorization_user(data):
-        await message.answer('Вы успешно авторизовались', reply_markup=kb.create_main_menu_kb())
-        await message.answer('Меню пользователя', reply_markup=kb.create_process_user_data())
+        await message.answer(f'Вы успешно авторизовались\n\n {pd.mess_menu}', reply_markup=kb.create_main_menu_kb())
         await state.clear()
     else:
         await message.answer('Не верный логин или пароль')
-        await enter_user_name_handler(message, state)
+        await login_handler(message, state)
 
 
-@router.message(F.text.lower() == 'Редактировать пользователя')
-@router.message(StateFilter(None), F.text)
-async def user_menu_handler(message: types.Message, state: FSMContext) -> None:
+@router.message(F.text.lower() == 'редактировать пользователя')
+@router.message(Command('edit_user'))
+async def user_menu_handler(message: types.Message) -> None:
     """
     Обрабатывает команду входа в меню редактирования пользователя, меняет стейт на новый
     :param message: Принимает сообщение пользователя
     :param state: Принимает состояние
     :return: None
     """
-    
+    await message.answer('Меню пользователя', reply_markup=kb.create_process_user_data())
+    await message.answer('Выберите действие:', reply_markup=types.ReplyKeyboardRemove())
 
 
-@router.callback_query(F.data == 'username')
-async def edit_username_callback_handler(callback: types.CallbackQuery) -> None:
+@router.callback_query(StateFilter(None), F.data == 'username')
+async def user_name_callback_handler(callback: types.CallbackQuery, state: FSMContext) -> None:
     """
     Обрабатывает клик по кнопке "Редактировать имя"
     :return: None
     """
-    await callback.message.answer('Введите новое имя пользователя')
+    await callback.message.answer('Введите старое имя пользователя')
     await callback.message.delete()
+    await state.set_state(States.old_username)
+    await callback.answer()
+
+
+@router.message(StateFilter(States.old_username), F.text)
+async def input_old_user_name_handler(message: types.Message, state: FSMContext) -> None:
+    """
+    Обрабатывает полученное сообщение пользователя, записывает в стейт и меняет стейт на новый
+    :param message: Принимает сообщение пользователя
+    :param state: Принимает состояние
+    :return: None
+    """
+    await state.update_data(user_id=message.from_user.id)
+    old_name =  message.text
+    user_id = message.from_user.id
+    if users.get_user_name(old_name, user_id):
+        await state.update_data(oldname=message.text)
+        await message.answer('Введите новое имя пользователя')
+        await state.set_state(States.new_username)
+    else:
+        await message.answer('Такого имени пользователя нет в базе, введите другое')
+
+
+@router.message(StateFilter(States.new_username), F.text)
+async def input_new_user_name_handler(message: types.Message, state: FSMContext) -> None:
+    """
+    Обрабатывает полученное сообщение пользователя, записывает в стейт и меняет стейт на новый
+    :param message: Принимает сообщение пользователя
+    :param state: Принимает состояние
+    :return: None
+    """
+    await state.update_data(newname=message.text)
+    data = await state.get_data()
+    users.edit_user_name(data)
+    await message.answer('Имя пользователя успешно изменено', reply_markup=kb.create_main_menu_kb())
