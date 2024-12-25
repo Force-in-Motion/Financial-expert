@@ -16,7 +16,7 @@ class States(StatesGroup):
     old_password = State()
     new_password = State()
 
-    del_username = State()
+    del_user = State()
 
     quantity_income = State()
     category_income = State()

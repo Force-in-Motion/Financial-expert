@@ -49,11 +49,11 @@ class Users:
         return False
 
 
-    def get_user_name(self, old_name, user_id) -> bool:
+    def get_user_name(self, user_name, user_id) -> bool:
 
         self.__cursor.execute(
             'SELECT username FROM Users WHERE username = ? AND user_id = ?',
-            (old_name, user_id)
+            (user_name, user_id)
         )
 
         result = self.__cursor.fetchone()
@@ -65,11 +65,11 @@ class Users:
         return False
 
 
-    def get_user_password(self, old_password, user_id) -> bool:
+    def get_user_password(self, password, user_id) -> bool:
 
         self.__cursor.execute(
             'SELECT password FROM Users WHERE password = ? AND user_id = ?',
-            (old_password, user_id)
+            (password, user_id)
         )
 
         result = self.__cursor.fetchone()
@@ -103,7 +103,8 @@ class Users:
 
     def del_user(self, value) -> None:
 
-        self.__cursor.execute('DELETE FROM Users WHERE user_id = ?', (value.get('user_id'),))
+        self.__cursor.execute('DELETE FROM Users WHERE username = ? AND user_id = ?',
+                              (value.get('username'), value.get('user_id'),))
 
         self.__connect.commit()
 

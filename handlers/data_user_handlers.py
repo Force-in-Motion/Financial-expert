@@ -111,12 +111,13 @@ async def user_menu_handler(message: types.Message) -> None:
     :param state: Принимает состояние
     :return: None
     """
-    await message.answer('Меню пользователя', reply_markup=kb.create_process_user_data())
-    await message.answer('Выберите действие:', reply_markup=types.ReplyKeyboardRemove())
+    await message.delete()
+    await message.answer('Меню пользователя:', reply_markup=types.ReplyKeyboardRemove())
+    await message.answer('Выберите действие:', reply_markup=kb.create_process_user_data())
 
 
 @router.callback_query(StateFilter(None), F.data == 'username')
-async def user_name_callback_handler(callback: types.CallbackQuery, state: FSMContext) -> None:
+async def edit_user_name_callback_handler(callback: types.CallbackQuery, state: FSMContext) -> None:
     """
     Обрабатывает клик по кнопке "Редактировать имя"
     :return: None
@@ -136,9 +137,7 @@ async def input_old_user_name_handler(message: types.Message, state: FSMContext)
     :return: None
     """
     await state.update_data(user_id=message.from_user.id)
-    old_name =  message.text
-    user_id = message.from_user.id
-    if users.get_user_name(old_name, user_id):
+    if users.get_user_name(message.text, message.from_user.id):
         await state.update_data(oldname=message.text)
         await message.answer('Введите новое имя пользователя')
         await state.set_state(States.new_username)
@@ -154,27 +153,18 @@ async def input_new_user_name_handler(message: types.Message, state: FSMContext)
     :param state: Принимает состояние
     :return: None
     """
-    await state.update_data(newname=message.text)
-    data = await state.get_data()
-    users.edit_user_name(data)
-    await message.answer('Имя пользователя успешно изменено', reply_markup=kb.create_main_menu_kb())
-
-
-@router.message(F.text.lower() == 'редактировать пользователя')
-@router.message(Command('edit_user'))
-async def user_menu_handler(message: types.Message) -> None:
-    """
-    Обрабатывает команду входа в меню редактирования пользователя, меняет стейт на новый
-    :param message: Принимает сообщение пользователя
-    :param state: Принимает состояние
-    :return: None
-    """
-    await message.answer('Меню пользователя', reply_markup=kb.create_process_user_data())
-    await message.answer('Выберите действие:', reply_markup=types.ReplyKeyboardRemove())
+    if not users.get_user_name(message.text, message.from_user.id):
+        await state.update_data(newname=message.text)
+        data = await state.get_data()
+        users.edit_user_name(data)
+        await message.answer('Имя пользователя успешно изменено', reply_markup=kb.create_main_menu_kb())
+        await state.clear()
+    else:
+        await message.answer('Такое имя пользователя уже занято, выберите другое')
 
 
 @router.callback_query(StateFilter(None), F.data == 'password')
-async def user_name_callback_handler(callback: types.CallbackQuery, state: FSMContext) -> None:
+async def edit_user_password_callback_handler(callback: types.CallbackQuery, state: FSMContext) -> None:
     """
     Обрабатывает клик по кнопке "Редактировать пароль"
     :return: None
@@ -186,7 +176,7 @@ async def user_name_callback_handler(callback: types.CallbackQuery, state: FSMCo
 
 
 @router.message(StateFilter(States.old_password), F.text)
-async def input_old_user_name_handler(message: types.Message, state: FSMContext) -> None:
+async def input_old_password_handler(message: types.Message, state: FSMContext) -> None:
     """
     Обрабатывает полученное сообщение пользователя, записывает в стейт и меняет стейт на новый
     :param message: Принимает сообщение пользователя
@@ -194,9 +184,7 @@ async def input_old_user_name_handler(message: types.Message, state: FSMContext)
     :return: None
     """
     await state.update_data(user_id=message.from_user.id)
-    old_password =  message.text
-    user_id = message.from_user.id
-    if users.get_user_password(old_password, user_id):
+    if users.get_user_password(message.text, message.from_user.id):
         await state.update_data(oldpassword=message.text)
         await message.answer('Введите новый пароль')
         await state.set_state(States.new_password)
@@ -205,7 +193,7 @@ async def input_old_user_name_handler(message: types.Message, state: FSMContext)
 
 
 @router.message(StateFilter(States.new_password), F.text)
-async def input_new_user_name_handler(message: types.Message, state: FSMContext) -> None:
+async def input_new_password_handler(message: types.Message, state: FSMContext) -> None:
     """
     Обрабатывает полученное сообщение пользователя, записывает в стейт и меняет стейт на новый
     :param message: Принимает сообщение пользователя
@@ -216,3 +204,34 @@ async def input_new_user_name_handler(message: types.Message, state: FSMContext)
     data = await state.get_data()
     users.edit_user_password(data)
     await message.answer('Пароль пользователя успешно изменен', reply_markup=kb.create_main_menu_kb())
+    await state.clear()
+
+@router.callback_query(StateFilter(None), F.data == 'deluser')
+async def del_user_callback_handler(callback: types.CallbackQuery, state: FSMContext) -> None:
+    """
+    Обрабатывает клик по кнопке "Удалить пользователя"
+    :return: None
+    """
+    await callback.message.answer('Введите имя пользователя для удаления')
+    await callback.message.delete()
+    await state.set_state(States.del_user)
+    await callback.answer()
+
+
+@router.message(StateFilter(States.del_user), F.text)
+async def input_del_user_handler(message: types.Message, state: FSMContext) -> None:
+    """
+    Обрабатывает полученное сообщение пользователя, записывает в стейт и меняет стейт на новый
+    :param message: Принимает сообщение пользователя
+    :param state: Принимает состояние
+    :return: None
+    """
+    await state.update_data(user_id=message.from_user.id)
+    if users.get_user_name(message.text, message.from_user.id):
+        await state.update_data(username=message.text)
+        data = await state.get_data()
+        users.del_user(data)
+        await message.answer('Пользователь успешно удален')
+        await state.clear()
+    else:
+        await message.answer('Такого пользователя нет в базе, укажите другое имя')
