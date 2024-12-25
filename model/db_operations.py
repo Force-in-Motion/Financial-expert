@@ -65,6 +65,22 @@ class Users:
         return False
 
 
+    def get_user_password(self, old_password, user_id) -> bool:
+
+        self.__cursor.execute(
+            'SELECT password FROM Users WHERE password = ? AND user_id = ?',
+            (old_password, user_id)
+        )
+
+        result = self.__cursor.fetchone()
+
+        if result:
+
+            return True
+
+        return False
+
+
     def edit_user_name(self, value) -> None:
 
         self.__cursor.execute(
@@ -79,7 +95,7 @@ class Users:
 
         self.__cursor.execute(
             'UPDATE Users SET password = ? WHERE password = ? AND user_id = ?',
-            (value.get('password'), value.get('user_id'))
+            (value.get('newpassword'), value.get('oldpassword'), value.get('user_id'))
         )
 
         self.__connect.commit()

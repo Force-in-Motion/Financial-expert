@@ -158,3 +158,61 @@ async def input_new_user_name_handler(message: types.Message, state: FSMContext)
     data = await state.get_data()
     users.edit_user_name(data)
     await message.answer('Имя пользователя успешно изменено', reply_markup=kb.create_main_menu_kb())
+
+
+@router.message(F.text.lower() == 'редактировать пользователя')
+@router.message(Command('edit_user'))
+async def user_menu_handler(message: types.Message) -> None:
+    """
+    Обрабатывает команду входа в меню редактирования пользователя, меняет стейт на новый
+    :param message: Принимает сообщение пользователя
+    :param state: Принимает состояние
+    :return: None
+    """
+    await message.answer('Меню пользователя', reply_markup=kb.create_process_user_data())
+    await message.answer('Выберите действие:', reply_markup=types.ReplyKeyboardRemove())
+
+
+@router.callback_query(StateFilter(None), F.data == 'password')
+async def user_name_callback_handler(callback: types.CallbackQuery, state: FSMContext) -> None:
+    """
+    Обрабатывает клик по кнопке "Редактировать пароль"
+    :return: None
+    """
+    await callback.message.answer('Введите старый пароль')
+    await callback.message.delete()
+    await state.set_state(States.old_password)
+    await callback.answer()
+
+
+@router.message(StateFilter(States.old_password), F.text)
+async def input_old_user_name_handler(message: types.Message, state: FSMContext) -> None:
+    """
+    Обрабатывает полученное сообщение пользователя, записывает в стейт и меняет стейт на новый
+    :param message: Принимает сообщение пользователя
+    :param state: Принимает состояние
+    :return: None
+    """
+    await state.update_data(user_id=message.from_user.id)
+    old_password =  message.text
+    user_id = message.from_user.id
+    if users.get_user_password(old_password, user_id):
+        await state.update_data(oldpassword=message.text)
+        await message.answer('Введите новый пароль')
+        await state.set_state(States.new_password)
+    else:
+        await message.answer('Такого пароля нет в базе, введите другой')
+
+
+@router.message(StateFilter(States.new_password), F.text)
+async def input_new_user_name_handler(message: types.Message, state: FSMContext) -> None:
+    """
+    Обрабатывает полученное сообщение пользователя, записывает в стейт и меняет стейт на новый
+    :param message: Принимает сообщение пользователя
+    :param state: Принимает состояние
+    :return: None
+    """
+    await state.update_data(newpassword=message.text)
+    data = await state.get_data()
+    users.edit_user_password(data)
+    await message.answer('Пароль пользователя успешно изменен', reply_markup=kb.create_main_menu_kb())

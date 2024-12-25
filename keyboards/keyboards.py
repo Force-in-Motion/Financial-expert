@@ -41,8 +41,8 @@ class CreateKeyboard:
         builder = InlineKeyboardBuilder()
 
         builder.button(text='Редактировать имя ', callback_data='username')
-        builder.button(text='Редактировать пароль', callback_data='username')
-        builder.button(text='Удалить пользователя', callback_data='username')
+        builder.button(text='Редактировать пароль', callback_data='password')
+        builder.button(text='Удалить пользователя', callback_data='deluser')
 
         builder.adjust(1)
 
