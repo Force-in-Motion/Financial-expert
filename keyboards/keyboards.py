@@ -13,7 +13,7 @@ class CreateKeyboard:
         builder.button(text='Регистрация')
         builder.button(text='Авторизация')
 
-        builder.adjust(2)
+        builder.adjust(2, 1)
 
         return builder.as_markup(resize_keyboard=True)
 
@@ -28,8 +28,8 @@ class CreateKeyboard:
         builder.button(text='Добавить расход')
         builder.button(text='История транзакций')
         builder.button(text='Статистика')
-        builder.button(text='Редактировать пользователя')
-        builder.button(text='Помощь')
+        builder.button(text='Меню пользователя')
+        builder.button(text='Главное меню')
 
         builder.adjust(1, 2, 2, 1, 1, )
 
@@ -43,6 +43,7 @@ class CreateKeyboard:
         builder.button(text='Редактировать имя ', callback_data='username')
         builder.button(text='Редактировать пароль', callback_data='password')
         builder.button(text='Удалить пользователя', callback_data='deluser')
+        builder.button(text='Главное меню', callback_data='menu')
 
         builder.adjust(1)
 
@@ -56,6 +57,7 @@ class CreateKeyboard:
 
         builder.button(text='Добавить цель', callback_data='add_goal')
         builder.button(text='Мои цели', callback_data='my_goal')
+        builder.button(text='Главное меню', callback_data='menu')
 
         builder.adjust(1)
 
@@ -69,6 +71,7 @@ class CreateKeyboard:
 
         builder.button(text='Список целей', callback_data='list_goal')
         builder.button(text='Показать статистику', callback_data='statistic')
+        builder.button(text='Главное меню', callback_data='menu')
 
         builder.adjust(1)
 
@@ -76,12 +79,12 @@ class CreateKeyboard:
 
 
     @staticmethod
-    def create_list_goals_kb():
+    def create_list_goals_kb(user_id):
         goal = Goal()
 
         builder = InlineKeyboardBuilder()
 
-        for elem in goal.get_all_description_goal():
+        for elem in goal.get_all_description_goal(user_id):
 
             builder.button(text=elem, callback_data=elem)
 
@@ -98,6 +101,7 @@ class CreateKeyboard:
 
         builder.button(text='Удалить цель', callback_data='del_goal')
         builder.button(text='Добавить депозит', callback_data='add_deposit')
+        builder.button(text='Главное меню', callback_data='menu')
 
         builder.adjust(1)
 
@@ -110,6 +114,7 @@ class CreateKeyboard:
 
         builder.button(text='Активные цели', callback_data='active')
         builder.button(text='Завершенные цели', callback_data='finished')
+        builder.button(text='Главное меню', callback_data='menu')
 
         builder.adjust(1)
 

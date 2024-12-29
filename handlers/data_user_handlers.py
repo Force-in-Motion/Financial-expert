@@ -69,6 +69,7 @@ async def login_handler(message: types.Message, state: FSMContext) -> None:
     """
     await message.answer('Введите имя пользователя', reply_markup=types.ReplyKeyboardRemove())
     await state.set_state(States.enter_username)
+    await state.update_data(user_id=message.from_user.id)
 
 
 @router.message(StateFilter(States.enter_username), F.text)
@@ -102,8 +103,8 @@ async def enter_password_handler(message: types.Message, state: FSMContext) -> N
         await login_handler(message, state)
 
 
-@router.message(F.text.lower() == 'редактировать пользователя')
-@router.message(Command('edit_user'))
+@router.message(F.text.lower() == 'меню пользователя')
+@router.message(Command('menu_user'))
 async def user_menu_handler(message: types.Message) -> None:
     """
     Обрабатывает команду входа в меню редактирования пользователя, меняет стейт на новый
@@ -231,7 +232,7 @@ async def input_del_user_handler(message: types.Message, state: FSMContext) -> N
         await state.update_data(username=message.text)
         data = await state.get_data()
         users.del_user(data)
-        await message.answer('Пользователь успешно удален')
+        await message.answer('Пользователь успешно удален', reply_markup=kb.create_main_menu_kb())
         await state.clear()
     else:
         await message.answer('Такого пользователя нет в базе, укажите другое имя')

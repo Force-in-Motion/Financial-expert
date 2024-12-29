@@ -11,6 +11,7 @@ router = Router()
 goal = Goal()
 
 
+
 @router.message( F.text.lower() == 'меню целей')
 @router.message(Command('goal'))
 async def goals_menu_handler(message: types.Message) -> None:
@@ -19,7 +20,8 @@ async def goals_menu_handler(message: types.Message) -> None:
     :param message: Принимает текст сообщения, которое пользователь пишет в чат
     :return: None
     """
-    await message.answer('Войдите в требуемое меню', reply_markup=kb.create_menu_goal_kb())
+    await message.answer('Меню целей', reply_markup=types.ReplyKeyboardRemove())
+    await message.answer('Выберите требуемый раздел меню', reply_markup=kb.create_menu_goal_kb())
 
 
 @router.callback_query(StateFilter(None), F.data == 'add_goal')
@@ -35,20 +37,20 @@ async def add_goal_callback_handler(callback: types.CallbackQuery, state: FSMCon
 
 
 @router.message(StateFilter(States.description), F.text)
-async def add_description_goal_handler(message: types.Message, state: FSMContext) -> None:
+async def input_description_goal_handler(message: types.Message, state: FSMContext) -> None:
     """
     Обрабатывает полученное сообщение пользователя, записывает в стейт и меняет стейт на новый
     :param message: Принимает текст сообщения, которое пользователь пишет в чат
     :param state: Состояние, находясь в котором бот реагирует на команду пользователя
     :return: None
     """
-    await state.update_data(description=message.text)
+    await state.update_data(description=message.text, user_id=message.from_user.id)
     await message.answer('Введите сумму для депозита')
     await state.set_state(States.required)
 
 
 @router.message(StateFilter(States.required), F.text)
-async def creating_finished_record_goal_handler(message: types.Message, state: FSMContext) -> None:
+async def input_deposit_goal_handler(message: types.Message, state: FSMContext) -> None:
     """
     Обрабатывает полученное сообщение пользователя, записывает в стейт и затем извлекает из стейта
     :param message: Принимает текст сообщения, которое пользователь пишет в чат
@@ -59,7 +61,7 @@ async def creating_finished_record_goal_handler(message: types.Message, state: F
         await state.update_data(required=message.text)
         data = await state.get_data()
         goal.add_goal(data)
-        await message.answer('Цель успешно создана')
+        await message.answer('Цель успешно создана', reply_markup=kb.create_main_menu_kb())
         await state.clear()
     else:
         await message.reply('Введите число!')
@@ -82,8 +84,9 @@ async def list_goals_callback_handler(callback: types.CallbackQuery, state: FSMC
     Обрабатывает клик по кнопке 'Список целей'
     :return: None
     """
-    if goal.get_all_description_goal():
-        await callback.message.answer('Список активных целей', reply_markup=kb.create_list_goals_kb())
+    user_id = callback.from_user.id
+    if goal.get_all_description_goal(user_id):
+        await callback.message.answer('Список активных целей', reply_markup=kb.create_list_goals_kb(user_id))
         await state.set_state(States.one_goal_menu)
     else:
         await callback.message.answer('Вы пока не добавили ни одну цель!')
@@ -91,15 +94,17 @@ async def list_goals_callback_handler(callback: types.CallbackQuery, state: FSMC
     await callback.answer()
 
 
-@router.callback_query(StateFilter(States.one_goal_menu), F.data.in_(goal.get_all_description_goal()))
-async def menu_one_goal_callback_handler(callback: types.CallbackQuery, state: FSMContext) -> None:
+@router.callback_query(StateFilter(States.one_goal_menu), F.data == 'del_goal')
+async def del_goal_callback_handler(callback: types.CallbackQuery, state: FSMContext) -> None:
     """
-    Обрабатывает клик по кнопке названия цели
+    Обрабатывает клик по кнопке выбора цели для ее удаления
     :return: None
     """
-    await state.update_data(description=callback.data)
-    await callback.message.answer('Меню вашей цели', reply_markup=kb.create_menu_one_goal())
+    data = await state.get_data()
+    goal.del_goal(data)
+    await callback.message.answer('Цель успешно удалена', reply_markup=kb.create_main_menu_kb())
     await callback.message.delete()
+    await state.clear()
     await callback.answer()
 
 
@@ -115,6 +120,18 @@ async def add_deposit_goal_callback_handler(callback: types.CallbackQuery, state
     await callback.answer()
 
 
+@router.callback_query(StateFilter(States.one_goal_menu))
+async def menu_one_goal_callback_handler(callback: types.CallbackQuery, state: FSMContext) -> None:
+    """
+    Обрабатывает клик по кнопке названия цели
+    :return: None
+    """
+    await state.update_data(description=callback.data, user_id=callback.from_user.id)
+    await callback.message.answer('Меню вашей цели', reply_markup=kb.create_menu_one_goal())
+    await callback.message.delete()
+    await callback.answer()
+
+
 @router.message(StateFilter(States.add_deposit), F.text)
 async def get_value_deposit_handler(message: types.Message, state: FSMContext) -> None:
     """
@@ -124,10 +141,10 @@ async def get_value_deposit_handler(message: types.Message, state: FSMContext) -
     :return: None
     """
     if message.text.isdigit():
-        await state.update_data(deposit=message.text)
+        await state.update_data(deposit=message.text, user_id=message.from_user.id)
         data = await state.get_data()
         goal.add_deposit(data)
-        await message.answer('Депозит успешно добавлен')
+        await message.answer('Депозит успешно добавлен', reply_markup=kb.create_main_menu_kb())
         if goal.check_accumulation(data):
             await message.answer('Вы успешно завершили накопление\n\n Цель достигнута и перенесена в раздел завершенных!')
             goal.transfers_in_completed_goals(data)
@@ -135,20 +152,6 @@ async def get_value_deposit_handler(message: types.Message, state: FSMContext) -
         await state.clear()
     else:
         await message.reply('Введите числовое значение')
-
-
-@router.callback_query(StateFilter(States.one_goal_menu), F.data == 'del_goal')
-async def del_goal_callback_handler(callback: types.CallbackQuery, state: FSMContext) -> None:
-    """
-    Обрабатывает клик по кнопке выбора цели для ее удаления
-    :return: None
-    """
-    data = await state.get_data()
-    goal.del_goal(data)
-    await callback.message.answer('Цель успешно удалена')
-    await callback.message.delete()
-    await state.clear()
-    await callback.answer()
 
 
 @router.callback_query(F.data == 'statistic')
@@ -168,25 +171,37 @@ async def active_goals_callback_handler(callback: types.CallbackQuery) -> None:
     Обрабатывает клик по кнопке "Активные цели"
     :return: None
     """
+    user_id = callback.from_user.id
     await callback.message.answer(text='Статистика активных целей')
     await callback.message.delete()
-    data = goal.get_all_data_goal()
+    data = goal.get_all_data_goal(user_id)
     if data:
         for row in data:
-            await callback.message.answer(text=f'Цель накопления: {row[1]}\n Требуемая сумма: {row[2]}\n '
-            f'Накопления: {row[3]}\n Процент накопления: {row[3] / row[2] * 100}\n Остаток: {row[2] - row[3]}\n')
+            if row[4] != 0:
+                await callback.message.answer(text=f'Цель накопления: {row[2]}\n Требуемая сумма: {row[3]}\n '
+                f'Накопления: {row[4]}\n Процент накопления: {row[4] / row[3] * 100}\n Остаток: {row[3] - row[4]}\n',
+                reply_markup=kb.create_main_menu_kb())
+                await callback.answer()
+            else:
+                await callback.message.answer('Вы пока не добавили ни одного взноса, процент посчитать невозможно', reply_markup=kb.create_main_menu_kb())
+                await callback.answer()
     else:
-        await callback.message.answer('Активные цели отсутствуют, для начала добавьте их')
+        await callback.message.answer('Активные цели отсутствуют, для начала добавьте их', reply_markup=kb.create_main_menu_kb())
+        await callback.answer()
 
 
 @router.callback_query(F.data == 'finished')
 async def finished_goals_callback_handler(callback: types.CallbackQuery) -> None:
+    user_id = callback.from_user.id
     await callback.message.answer(text='Статистика завершенных целей')
     await callback.message.delete()
-    data = goal.get_all_data_completed_goal()
+    data = goal.get_all_data_completed_goal(user_id)
     if data:
         for row in data:
-            await callback.message.answer(text=f'Цель накопления: {row[1]}\n Требуемая сумма: {row[2]}\n '
-            f'Накопления: {row[3]}\n Процент накопления: {row[3] / row[2] * 100}\n Остаток: {row[2] - row[3]}\n')
+            await callback.message.answer(text=f'Цель накопления: {row[2]}\n Требуемая сумма: {row[3]}\n '
+            f'Накопления: {row[4]}\n Процент накопления: {row[4] / row[3] * 100}\n Остаток: {row[3] - row[4]}\n',
+            reply_markup=kb.create_main_menu_kb())
+            await callback.answer()
     else:
-        await callback.message.answer('Вы пока не завершили ни одной цели')
+        await callback.message.answer('Вы пока не завершили ни одной цели', reply_markup=kb.create_main_menu_kb())
+        await callback.answer()
