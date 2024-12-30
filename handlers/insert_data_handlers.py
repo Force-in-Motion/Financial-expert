@@ -6,6 +6,7 @@ from aiogram import F
 from model.states import States
 from model.db_operations import Income
 from model.db_operations import Expense
+from keyboards.keyboards import CreateKeyboard as kb
 
 router = Router()
 income = Income()
@@ -20,8 +21,9 @@ async def input_quantity_income_handler(message: types.Message, state: FSMContex
     :param state: Состояние, находясь в котором бот реагирует на команду пользователя
     :return: None
     """
-    await message.answer('Введите сумму своего дохода')
+    await message.answer('Введите сумму своего дохода', reply_markup=types.ReplyKeyboardRemove())
     await state.set_state(States.quantity_income)
+    await state.update_data(user_id=message.from_user.id)
 
 
 @router.message(StateFilter(States.quantity_income), F.text)
@@ -49,14 +51,11 @@ async def creating_finished_record_income_handler(message: types.Message, state:
     :param state: Состояние, находясь в котором бот реагирует на команду пользователя
     :return: None
     """
-    if message.text.isdigit():
-        await state.update_data(category=message.text)
-    else:
-        await state.update_data(category=message.text.upper())
 
+    await state.update_data(category=message.text)
     data = await state.get_data()
     income.add_income(data)
-    await message.answer('Ваши данные успешно сохранены')
+    await message.answer('Ваши данные успешно сохранены', reply_markup=kb.create_main_menu_kb())
     await state.clear()
 
 
@@ -70,8 +69,9 @@ async def input_quantity_expense_handler(message: types.Message, state: FSMConte
     :param state: Состояние, находясь в котором бот реагирует на команду пользователя
     :return: None
     """
-    await message.answer('Введите сумму своего расхода')
+    await message.answer('Введите сумму своего расхода', reply_markup=types.ReplyKeyboardRemove())
     await state.set_state(States.quantity_expense)
+    await state.update_data(user_id=message.from_user.id)
 
 
 @router.message(StateFilter(States.quantity_expense), F.text)
@@ -99,20 +99,14 @@ async def creating_finished_record_expense_handler(message: types.Message, state
     :param state: Состояние, находясь в котором бот реагирует на команду пользователя
     :return: None
     """
-    if message.text.isdigit():
-        await state.update_data(category=message.text)
-    else:
-        await state.update_data(category=message.text.upper())
-
+    await state.update_data(category=message.text)
     data = await state.get_data()
     expense.add_expense(data)
-    await message.answer('Ваши данные успешно сохранены')
+    await message.answer('Ваши данные успешно сохранены', reply_markup=kb.create_main_menu_kb())
     await state.clear()
 
 
-# @router.message(StateFilter(States.category_income, States.category_expense, States.quantity_income,
-#                             States.quantity_expense, States.description, States.required, States.one_goal_menu,
-#                             States.add_deposit, None))
+# @router.message()
 # async def input_error_handler(message: types.Message, state: FSMContext) -> None:
 #     """
 #     Обрабатывает полученное сообщение пользователя и сообщает об ошибке ввода если получен не текст
