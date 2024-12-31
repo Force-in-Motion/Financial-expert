@@ -4,8 +4,8 @@ from aiogram import Router, types
 from aiogram import F
 
 from model.states import States
-from model.db_operations import Income
-from model.db_operations import Expense
+from model.logic_deposits import Income
+from model.logic_deposits import Expense
 from keyboards.keyboards import CreateKeyboard as kb
 
 router = Router()

@@ -4,7 +4,7 @@ from aiogram import Router, types
 from aiogram import F
 
 from model.states import States
-from model.db_operations import Goal
+from model.logic_goals import Goal
 from keyboards.keyboards import CreateKeyboard as kb
 
 router = Router()
@@ -196,6 +196,7 @@ async def finished_goals_callback_handler(callback: types.CallbackQuery) -> None
     await callback.message.answer(text='Статистика завершенных целей')
     await callback.message.delete()
     data = goal.get_all_data_completed_goal(user_id)
+
     if data:
         for row in data:
             await callback.message.answer(text=f'Цель накопления: {row[2]}\n Требуемая сумма: {row[3]}\n '

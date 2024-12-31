@@ -1,6 +1,6 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 
-from model.db_operations import Goal
+from model.logic_goals import Goal
 
 
 class CreateKeyboard:
@@ -43,6 +43,21 @@ class CreateKeyboard:
         builder.button(text='Редактировать имя ', callback_data='username')
         builder.button(text='Редактировать пароль', callback_data='password')
         builder.button(text='Удалить пользователя', callback_data='deluser')
+        builder.button(text='Главное меню', callback_data='menu')
+
+        builder.adjust(1)
+
+        return builder.as_markup(resize_keyboard=True)
+
+
+    @staticmethod
+    def create_menu_transactions():
+
+        builder = InlineKeyboardBuilder()
+
+        builder.button(text='Транзакции за период', callback_data='period')
+        builder.button(text='Транзакции по категории', callback_data='category')
+        builder.button(text='Итоги за период', callback_data='results')
         builder.button(text='Главное меню', callback_data='menu')
 
         builder.adjust(1)
@@ -114,6 +129,17 @@ class CreateKeyboard:
 
         builder.button(text='Активные цели', callback_data='active')
         builder.button(text='Завершенные цели', callback_data='finished')
+        builder.button(text='Главное меню', callback_data='menu')
+
+        builder.adjust(1)
+
+        return builder.as_markup(resize_keyboard=True)
+
+
+    @staticmethod
+    def create_back_main_menu_kb():
+        builder = InlineKeyboardBuilder()
+
         builder.button(text='Главное меню', callback_data='menu')
 
         builder.adjust(1)

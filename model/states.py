@@ -30,3 +30,11 @@ class States(StatesGroup):
     one_goal_menu = State()
     add_deposit = State()
 
+    start_period = State()
+    end_period = State()
+
+    category = State()
+
+    start_period_result = State()
+    end_period_result = State()
+

@@ -4,7 +4,7 @@ from aiogram import Router, types
 from aiogram import F
 
 from model.states import States
-from model.db_operations import Users
+from model.logic_users import Users
 from keyboards.keyboards import CreateKeyboard as kb
 from utilits.processing_data import ProcessingData as pd
 
