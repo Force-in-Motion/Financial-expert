@@ -4,6 +4,7 @@ from aiogram.fsm.state import StatesGroup, State
 
 
 class States(StatesGroup):
+
     add_username = State()
     add_password = State()
 

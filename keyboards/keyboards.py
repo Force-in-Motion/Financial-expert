@@ -7,7 +7,10 @@ class CreateKeyboard:
 
     @staticmethod
     def create_enter_menu_kb():
-
+        """
+        Создает начальную клавиатуру для регистрации или авторизации пользователя
+        :return: Клавиатуру
+        """
         builder = ReplyKeyboardBuilder()
 
         builder.button(text='Регистрация')
@@ -20,7 +23,10 @@ class CreateKeyboard:
 
     @staticmethod
     def create_main_menu_kb():
-
+        """
+        Создает клавиатуру главного меню бота
+        :return: Клавиатуру
+        """
         builder = ReplyKeyboardBuilder()
 
         builder.button(text='Меню целей')
@@ -38,6 +44,10 @@ class CreateKeyboard:
 
     @staticmethod
     def create_process_user_data():
+        """
+        Создает клавиатуру для работы с меню пользователя
+        :return: Клавиатуру
+        """
         builder = InlineKeyboardBuilder()
 
         builder.button(text='Редактировать имя ', callback_data='username')
@@ -52,7 +62,10 @@ class CreateKeyboard:
 
     @staticmethod
     def create_menu_transactions():
-
+        """
+        Создает клавиатуру для работы с транзакциями пользователя
+        :return: Клавиатуру
+        """
         builder = InlineKeyboardBuilder()
 
         builder.button(text='Транзакции за период', callback_data='period')
@@ -67,7 +80,10 @@ class CreateKeyboard:
 
     @staticmethod
     def create_menu_goal_kb():
-
+        """
+        Создает клавиатуру для работы с целями пользователя
+        :return: Клавиатуру
+        """
         builder = InlineKeyboardBuilder()
 
         builder.button(text='Добавить цель', callback_data='add_goal')
@@ -81,7 +97,10 @@ class CreateKeyboard:
 
     @staticmethod
     def create_menu_my_goals_kb():
-
+        """
+        Создает клавиатуру для работы с целями пользователя
+        :return: Клавиатуру
+        """
         builder = InlineKeyboardBuilder()
 
         builder.button(text='Список целей', callback_data='list_goal')
@@ -95,6 +114,11 @@ class CreateKeyboard:
 
     @staticmethod
     def create_list_goals_kb(user_id):
+        """
+        Создает клавиатуру для работы с целями пользователя,
+         которая выводит на экран все цели пользователя в виде инлайн кнопок
+        :return: Клавиатуру
+        """
         goal = Goal()
 
         builder = InlineKeyboardBuilder()
@@ -112,6 +136,10 @@ class CreateKeyboard:
 
     @staticmethod
     def create_menu_one_goal():
+        """
+        Создает клавиатуру для работы с целями пользователя
+        :return: Клавиатуру
+        """
         builder = InlineKeyboardBuilder()
 
         builder.button(text='Удалить цель', callback_data='del_goal')
@@ -125,6 +153,10 @@ class CreateKeyboard:
 
     @staticmethod
     def create_main_menu_statistic_goals():
+        """
+        Создает клавиатуру для работы со статистикой целей пользователя
+        :return: Клавиатуру
+        """
         builder = InlineKeyboardBuilder()
 
         builder.button(text='Активные цели', callback_data='active')
@@ -138,6 +170,10 @@ class CreateKeyboard:
 
     @staticmethod
     def create_back_main_menu_kb():
+        """
+        Создает клавиатуру, которая возвращает пользователя в главное меню бота очищая все состояния
+        :return: Клавиатуру
+        """
         builder = InlineKeyboardBuilder()
 
         builder.button(text='Главное меню', callback_data='menu')

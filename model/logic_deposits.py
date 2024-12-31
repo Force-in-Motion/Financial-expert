@@ -12,7 +12,10 @@ class Income:
 
 
     def __create_table_income(self) -> None:
-
+        """
+        Создает таблицу в базе данных, содержащую депозиты доходов пользователя
+        :return: None
+        """
         self.__cursor.execute("""
         CREATE TABLE IF NOT EXISTS Income (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -28,7 +31,11 @@ class Income:
 
 
     def add_income(self, value) -> None:
-
+        """
+        Добавляет доходы пользователя в соответствующую таблицу
+        :param value: Принимает суммы, категорию и id пользователя
+        :return: None
+        """
         current_date = datetime.now().strftime('%Y-%m-%d')
 
         self.__cursor.execute(
@@ -41,6 +48,7 @@ class Income:
 
 
 class Expense:
+
     def __init__(self):
         self.__connect = sqlite3.connect(sld.get_db_path())
         self.__cursor = self.__connect.cursor()
@@ -48,7 +56,10 @@ class Expense:
 
 
     def __create_table_expense(self) -> None:
-
+        """
+        Создает таблицу в базе данных, содержащую депозиты расходов пользователя
+        :return: None
+        """
         self.__cursor.execute("""
         CREATE TABLE IF NOT EXISTS Expense (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -64,7 +75,11 @@ class Expense:
 
 
     def add_expense(self, value) -> None:
-
+        """
+        Добавляет расходы пользователя в соответствующую таблицу
+        :param value: Принимает суммы, категорию и id пользователя
+        :return: None
+        """
         current_date = datetime.now().strftime('%Y-%m-%d')
 
         self.__cursor.execute(
