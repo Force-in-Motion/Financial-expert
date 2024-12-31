@@ -31,6 +31,10 @@ class SaveLoadData:
 
     @staticmethod
     def get_token() -> str:
+        """
+        Получает токен по указанному пути
+        :return: Токен в виде строки
+        """
         with open(SaveLoadData.get_token_path(), 'r', encoding='utf-8') as f:
             data = json.load(f)
             return data['token']

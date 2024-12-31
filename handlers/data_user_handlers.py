@@ -109,7 +109,6 @@ async def user_menu_handler(message: types.Message) -> None:
     """
     Обрабатывает команду входа в меню редактирования пользователя, меняет стейт на новый
     :param message: Принимает сообщение пользователя
-    :param state: Принимает состояние
     :return: None
     """
     await message.delete()
