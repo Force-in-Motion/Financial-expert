@@ -48,4 +48,7 @@ class States(StatesGroup):
     start_period_balance = State()
     end_period_balance = State()
 
+    start_period_struct_by_category = State()
+    end_period_struct_by_category = State()
+
 

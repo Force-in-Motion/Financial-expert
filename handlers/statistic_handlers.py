@@ -185,15 +185,61 @@ async def input_end_period_balance_handler(message: types.Message, state: FSMCon
         await message.answer('Не корректный ввод даты')
 
 
-@router.callback_query(F.data == 'structure_by_categories')
-async def struct_by_category_callback_handler(callback: types.CallbackQuery) -> None:
+@router.callback_query(StateFilter(None), F.data == 'structure_by_categories')
+async def struct_by_category_callback_handler(callback: types.CallbackQuery, state: FSMContext) -> None:
     """
     Обрабатывает клик по кнопке "Структура по категориям"
     :return: None
     """
-    await callback.message.answer('Структура расходов и доходов по категориям', reply_markup=types.ReplyKeyboardRemove())
-    await callback.message.answer(f'Доходы:')
-    income = stat.get_struct_income(callback.message.from_user.id)
+    await callback.message.answer('Введите начало периода в формате: год-месяц-день\nПример: 2025-01-01', reply_markup=kb.create_back_main_menu_kb())
+    await callback.message.delete()
+    await state.set_state(States.start_period_struct_by_category)
+    await callback.answer()
+
+
+@router.message(StateFilter(States.start_period_struct_by_category), F.text)
+async def input_start_period_struct_by_category_handler(message: types.Message, state: FSMContext) -> None:
+    """
+    Обрабатывает сообщение пользователя (ввод старта периода), записывает данные в стейт, меняет стейт на новый
+    :param message: Принимает сообщение пользователя
+    :param state: Принимает состояние
+    :return: None
+    """
+    if pd.validate_date_format(message.text):
+        await state.update_data(user_id=message.from_user.id, start_date=message.text)
+        await message.answer('Введите окончание периода', reply_markup=kb.create_back_main_menu_kb())
+        await state.set_state(States.end_period_struct_by_category)
+    else:
+        await message.answer('Не корректный ввод даты')
+
+
+@router.message(StateFilter(States.end_period_struct_by_category), F.text)
+async def input_end_period_struct_by_category_handler(message: types.Message, state: FSMContext) -> None:
+
+
+    await message.answer('Структура расходов и доходов по категориям')
+    await message.answer('Доходы:')
+
+    await state.update_data(end_date=message.text)
+    data = await state.get_data()
+    income = stat.get_struct_income(message.from_user.id)
+    expense = stat.get_struct_expense(message.from_user.id)
+    sum_income = stat.get_sum_income(data)
+    sum_expense = stat.get_sum_expense(data)
+
     if income:
         for row in income:
-            await callback.message.answer('')
+            await message.answer(f'{row[0]}: {row[1] / sum_income * 100:.2f}%  от общих доходов, сумма: {row[1]}')
+    else:
+        await message.answer('Записи о доходах отсутствуют')
+
+    await message.answer('Расходы:')
+
+    if expense:
+        for row in expense:
+            await message.answer(f'{row[0]}: {row[1] / sum_expense * 100:.2f}%  от общих расходов, сумма: {row[1]}', reply_markup=kb.create_main_menu_kb())
+        await state.clear()
+
+    else:
+        await message.answer('Записи о расходах отсутствуют', reply_markup=kb.create_main_menu_kb())
+        await state.clear()
