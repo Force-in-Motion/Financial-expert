@@ -33,12 +33,12 @@ async def transactions_by_period_callback_handler(callback: types.CallbackQuery,
     :return: None
     """
     await callback.message.answer('Введите начало периода в формате: год-месяц-день\nПример: 2025-01-01', reply_markup=kb.create_back_main_menu_kb())
-    await state.set_state(States.start_period)
+    await state.set_state(States.start_period_transactions)
     await callback.message.delete()
     await callback.answer()
 
 
-@router.message(StateFilter(States.start_period), F.text)
+@router.message(StateFilter(States.start_period_transactions), F.text)
 async def input_start_period_handler(message: types.Message, state: FSMContext) -> None:
     """
     Обрабатывает сообщение пользователя (ввод старта периода), записывает данные в стейт, меняет стейт на новый
@@ -49,12 +49,12 @@ async def input_start_period_handler(message: types.Message, state: FSMContext) 
     if pd.validate_date_format(message.text):
         await state.update_data(user_id=message.from_user.id, start_date=message.text)
         await message.answer('Введите окончание периода', reply_markup=kb.create_back_main_menu_kb())
-        await state.set_state(States.end_period)
+        await state.set_state(States.end_period_transactions)
     else:
         await message.answer('Не корректный ввод даты')
 
 
-@router.message(StateFilter(States.end_period), F.text)
+@router.message(StateFilter(States.end_period_transactions), F.text)
 async def input_end_period_handler(message: types.Message, state: FSMContext) -> None:
     """
     Обрабатывает сообщение пользователя (ввод окончания периода), записывает данные в стейт, меняет стейт на новый

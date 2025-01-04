@@ -181,3 +181,25 @@ class CreateKeyboard:
         builder.adjust(1)
 
         return builder.as_markup(resize_keyboard=True)
+
+
+    @staticmethod
+    def create_statistic_main_menu_kb():
+        """
+        Создает клавиатуру, которая определяет меню возможностей разделе статистики
+        :return: Клавиатуру
+        """
+        builder = InlineKeyboardBuilder()
+
+        builder.button(text='Общий доход за период', callback_data='all_income')
+        builder.button(text='Общий расход за период', callback_data='all_expense')
+        builder.button(text='Чистый баланс за период', callback_data='all_balance')
+        builder.button(text='Структура по категориям', callback_data='structure_by_categories')
+        builder.button(text='Графическое представление', callback_data='graphical_visual')
+        builder.button(text='ТОП затратных категорий', callback_data='progress_goals')
+        builder.button(text='Прогресс целей', callback_data='progress_goals')
+        builder.button(text='Главное меню', callback_data='menu')
+
+        builder.adjust(1)
+
+        return builder.as_markup(resize_keyboard=True)

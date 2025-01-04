@@ -31,11 +31,21 @@ class States(StatesGroup):
     one_goal_menu = State()
     add_deposit = State()
 
-    start_period = State()
-    end_period = State()
+    start_period_transactions = State()
+    end_period_transactions = State()
 
     category = State()
 
     start_period_result = State()
     end_period_result = State()
+
+    start_period_income = State()
+    end_period_income = State()
+
+    start_period_expense = State()
+    end_period_expense = State()
+
+    start_period_balance = State()
+    end_period_balance = State()
+
 

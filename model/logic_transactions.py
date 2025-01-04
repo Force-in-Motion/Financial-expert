@@ -104,3 +104,33 @@ class Transactions:
         result = self.__cursor.fetchall()
 
         return result
+
+
+    def get_data_transactions_income(self, user_id) -> list:
+        """
+        Отправляет запрос в базу данных для получения транзакций по доходам по user_id
+        :param user_id: Принимает user_id
+        :return: Результат запроса
+        """
+        self.__cursor.execute(
+            'SELECT category, quantity FROM Income WHERE user_id = ?', (user_id, )
+        )
+
+        result = self.__cursor.fetchall()
+
+        return result
+
+
+    def get_data_transactions_expense(self, user_id) -> list:
+        """
+        Отправляет запрос в базу данных для получения транзакций по расходам по user_id
+        :param user_id: Принимает user_id
+        :return: Результат запроса
+        """
+        self.__cursor.execute(
+            'SELECT category, quantity FROM Expense WHERE user_id = ?', (user_id, )
+        )
+
+        result = self.__cursor.fetchall()
+
+        return result
