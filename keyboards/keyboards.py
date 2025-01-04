@@ -104,7 +104,7 @@ class CreateKeyboard:
         builder = InlineKeyboardBuilder()
 
         builder.button(text='Список целей', callback_data='list_goal')
-        builder.button(text='Показать статистику', callback_data='statistic')
+        builder.button(text='Показать статистику', callback_data='statistic_goal')
         builder.button(text='Главное меню', callback_data='menu')
 
         builder.adjust(1)
@@ -195,10 +195,22 @@ class CreateKeyboard:
         builder.button(text='Общий расход за период', callback_data='all_expense')
         builder.button(text='Чистый баланс за период', callback_data='all_balance')
         builder.button(text='Структура по категориям', callback_data='structure_by_categories')
-        builder.button(text='Графическое представление', callback_data='graphical_visual')
-        builder.button(text='ТОП затратных категорий', callback_data='progress_goals')
-        builder.button(text='Прогресс целей', callback_data='progress_goals')
+        builder.button(text='ТОП затратных категорий', callback_data='cost_categories')
+        builder.button(text='Прогресс целей', callback_data='statistic_goal')
         builder.button(text='Главное меню', callback_data='menu')
+
+        builder.adjust(1)
+
+        return builder.as_markup(resize_keyboard=True)
+
+
+    @staticmethod
+    def create_options_struct_output_kb():
+
+        builder = InlineKeyboardBuilder()
+
+        builder.button(text='Текстовое представление', callback_data='text_content')
+        builder.button(text='Графическое представление', callback_data='visual_content')
 
         builder.adjust(1)
 

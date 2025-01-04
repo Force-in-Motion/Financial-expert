@@ -12,7 +12,7 @@ class Statistic:
     def get_sum_income(self, value) -> str:
         """
         Используя другой класс отправляет запрос в базу данных для получения транзакций по доходам по полученным датам
-        :param value: Принимает дату старта и окончания
+        :param value: Принимает дату старта, окончания, user_id
         :return: str
         """
 
@@ -26,7 +26,7 @@ class Statistic:
     def get_sum_expense(self, value) -> str:
         """
         Используя другой класс отправляет запрос в базу данных для получения транзакций по расходам по полученным датам
-        :param value: Принимает дату старта и окончания
+        :param value: Принимает дату старта, окончания, user_id
         :return: str
         """
         data = self.__transactions.get_sum_transactions_expense(value)
@@ -36,38 +36,43 @@ class Statistic:
         return result
 
 
-    def get_balance(self, value) -> int:
+    def get_balance(self, value) -> int or bool:
         """
         Используя другой класс отправляет запрос в базу данных для получения транзакций по доходам и расходам по полученным датам
         Затем вычисляет чистый баланс
-        :param value: Принимает дату старта и окончания
+        :param value: Принимает дату старта, окончания, user_id
         :return: str
         """
         income = self.get_sum_income(value)
-
         expense = self.get_sum_expense(value)
 
-        result = int(income) - int(expense)
+        if income and expense:
+            result = int(income) - int(expense)
+            return result
 
-        return result
+        return False
 
 
-    def get_struct_income(self, user_id) -> list:
+    def get_struct_income(self, value) -> list:
         """
         Используя другой класс отправляет запрос в базу данных для получения транзакций по доходам по user_id
-        :param user_id: Принимает user_id
+        :param value: Принимает дату старта, окончания, user_id
         :return: list
         """
-        data = self.__transactions.get_data_transactions_income(user_id)
+        data = self.__transactions.get_data_transactions_income(value)
 
         return data
 
-    def get_struct_expense(self, user_id) -> list:
+    def get_struct_expense(self, value) -> list:
         """
         Используя другой класс отправляет запрос в базу данных для получения транзакций по доходам по user_id
-        :param user_id: Принимает user_id
+        :param value: Принимает дату старта, окончания, user_id
         :return: list
         """
-        data = self.__transactions.get_data_transactions_expense(user_id)
+        data = self.__transactions.get_data_transactions_expense(value)
 
         return data
+
+
+    def top_cost_categories(self, user_id):
+        pass

@@ -13,7 +13,7 @@ class Transactions:
     def get_transactions_income_by_date(self, value) -> list:
         """
         Отправляет запрос в базу данных для получения транзакций по доходам по полученным датам
-        :param value: Принимает дату старта и окончания
+        :param value: Принимает дату старта, окончания, user_id
         :return: Результат запроса
         """
         self.__cursor.execute(
@@ -29,7 +29,7 @@ class Transactions:
     def get_transactions_expense_by_date(self, value) -> list:
         """
         Отправляет запрос в базу данных для получения транзакций по расходам по полученным датам
-        :param value: Принимает дату старта и окончания
+        :param value: Принимает дату старта, окончания, user_id
         :return: Результат запроса
         """
         self.__cursor.execute(
@@ -45,11 +45,11 @@ class Transactions:
     def get_sum_transactions_income(self, value) -> list:
         """
         Отправляет запрос в базу данных для получения суммы транзакций по доходам по полученным датам
-        :param value: Принимает дату старта и окончания
+        :param value: Принимает дату старта, окончания, user_id
         :return: Результат запроса
         """
         self.__cursor.execute(
-            'SELECT SUM(quantity) FROM Income WHERE date BETWEEN ? AND ? AND  user_id = ?',
+            'SELECT SUM(quantity) FROM Income WHERE date BETWEEN ? AND ? AND user_id = ?',
             (value.get('start_date'), value.get('end_date'), value.get('user_id'))
         )
 
@@ -61,11 +61,11 @@ class Transactions:
     def get_sum_transactions_expense(self, value) -> list:
         """
         Отправляет запрос в базу данных для получения суммы транзакций по расходам по полученным датам
-        :param value: Принимает дату старта и окончания
+        :param value: Принимает дату старта, окончания, user_id
         :return: Результат запроса
         """
         self.__cursor.execute(
-            'SELECT SUM(quantity) FROM Expense WHERE date BETWEEN ? AND ? AND   user_id = ?',
+            'SELECT SUM(quantity) FROM Expense WHERE date BETWEEN ? AND ? AND user_id = ?',
             (value.get('start_date'), value.get('end_date'), value.get('user_id'))
         )
 
@@ -77,7 +77,7 @@ class Transactions:
     def get_transactions_income_by_category(self, value) -> list:
         """
         Отправляет запрос в базу данных для получения транзакций по доходам по полученной категории
-        :param value: Принимает дату старта и окончания
+        :param value: Принимает дату старта, окончания, user_id
         :return: Результат запроса
         """
         self.__cursor.execute(
@@ -93,7 +93,7 @@ class Transactions:
     def get_transactions_expense_by_category(self, value) -> list:
         """
         Отправляет запрос в базу данных для получения транзакций по расходам по полученной категории
-        :param value: Принимает дату старта и окончания
+        :param value: Принимает категорию, user_id
         :return: Результат запроса
         """
         self.__cursor.execute(
@@ -106,14 +106,16 @@ class Transactions:
         return result
 
 
-    def get_data_transactions_income(self, user_id) -> list:
+    def get_data_transactions_income(self, value) -> list:
         """
         Отправляет запрос в базу данных для получения транзакций по доходам по user_id
-        :param user_id: Принимает user_id
+        :param value: Принимает дату старта, окончания, user_id
         :return: Результат запроса
         """
         self.__cursor.execute(
-            'SELECT category, quantity FROM Income WHERE user_id = ?', (user_id, )
+            'SELECT category, quantity FROM Income WHERE date BETWEEN ? AND ? AND user_id = ?',
+            (value.get('start_date'), value.get('end_date'), value.get('user_id'))
+
         )
 
         result = self.__cursor.fetchall()
@@ -121,14 +123,15 @@ class Transactions:
         return result
 
 
-    def get_data_transactions_expense(self, user_id) -> list:
+    def get_data_transactions_expense(self, value) -> list:
         """
         Отправляет запрос в базу данных для получения транзакций по расходам по user_id
-        :param user_id: Принимает user_id
+        :param value: Принимает дату старта, окончания, user_id
         :return: Результат запроса
         """
         self.__cursor.execute(
-            'SELECT category, quantity FROM Expense WHERE user_id = ?', (user_id, )
+            'SELECT category, quantity FROM Expense WHERE date BETWEEN ? AND ? AND user_id = ?',
+            (value.get('start_date'), value.get('end_date'), value.get('user_id'))
         )
 
         result = self.__cursor.fetchall()

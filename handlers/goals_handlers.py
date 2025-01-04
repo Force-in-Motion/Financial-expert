@@ -154,7 +154,7 @@ async def get_value_deposit_handler(message: types.Message, state: FSMContext) -
         await message.reply('Введите числовое значение')
 
 
-@router.callback_query(F.data == 'statistic')
+@router.callback_query(F.data == 'statistic_goal')
 async def statistic_menu_callback_handler(callback: types.CallbackQuery) -> None:
     """
     Обрабатывает клик по кнопке "Показать статистику"
@@ -179,7 +179,7 @@ async def active_goals_callback_handler(callback: types.CallbackQuery) -> None:
         for row in data:
             if row[4] != 0:
                 await callback.message.answer(text=f'Цель накопления: {row[2]}\n Требуемая сумма: {row[3]}\n '
-                f'Накопления: {row[4]}\n Процент накопления: {row[4] / row[3] * 100}\n Остаток: {row[3] - row[4]}\n',
+                f'Накопления: {row[4]}\n Процент накопления: {row[4] / row[3] * 100:.2f}\n Остаток: {row[3] - row[4]}\n',
                 reply_markup=kb.create_main_menu_kb())
                 await callback.answer()
             else:
