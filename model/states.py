@@ -54,6 +54,9 @@ class States(StatesGroup):
     start_period_struct_by_category_view_column = State()
     end_period_struct_by_category_view_column = State()
 
+    start_period_visual_circle = State()
+    end_period_visual_circle = State()
+
     start_period_cost_category = State()
     end_period_cost_category = State()
 

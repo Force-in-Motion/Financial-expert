@@ -9,7 +9,7 @@ from model.logic_statistic import Statistic
 from keyboards.keyboards import CreateKeyboard as kb
 from utilits.processing_data import ProcessingData as pd
 from service.service_data import SaveLoadData as sld
-from service.logic_graphs import VisualData
+from service.service_graphs import VisualData
 
 router = Router()
 stat = Statistic()
@@ -286,7 +286,7 @@ async def option_visual_struct_by_category_callback_handler(callback: types.Call
 
 
 @router.callback_query(StateFilter(None), F.data == 'column')
-async def visual_struct_by_category_callback_handler(callback: types.CallbackQuery, state: FSMContext) -> None:
+async def visual_column_callback_handler(callback: types.CallbackQuery, state: FSMContext) -> None:
     """
     Обрабатывает клик по кнопке "Столбчатая диаграмма"
     :return: None
@@ -298,7 +298,7 @@ async def visual_struct_by_category_callback_handler(callback: types.CallbackQue
 
 
 @router.message(StateFilter(States.start_period_struct_by_category_view_column), F.text)
-async def input_start_period_struct_by_category_visual_handler(message: types.Message, state: FSMContext) -> None:
+async def input_start_period_visual_column_handler(message: types.Message, state: FSMContext) -> None:
     """
     Обрабатывает сообщение пользователя (ввод старта периода), записывает данные в стейт, меняет стейт на новый
     :param message: Принимает сообщение пользователя
@@ -314,7 +314,7 @@ async def input_start_period_struct_by_category_visual_handler(message: types.Me
 
 
 @router.message(StateFilter(States.end_period_struct_by_category_view_column), F.text)
-async def input_start_period_struct_by_category_visual_handler(message: types.Message, state: FSMContext) -> None:
+async def input_end_period_visual_column_handler(message: types.Message, state: FSMContext) -> None:
     """
     Обрабатывает сообщение пользователя (ввод старта периода), записывает данные в стейт, меняет стейт на новый
     :param message: Принимает сообщение пользователя
@@ -348,11 +348,67 @@ async def input_start_period_struct_by_category_visual_handler(message: types.Me
         await message.answer('Не корректный ввод даты')
 
 
+@router.callback_query(StateFilter(None), F.data == 'circle')
+async def visual_circle_callback_handler(callback: types.CallbackQuery, state: FSMContext) -> None:
+    """
+    Обрабатывает клик по кнопке "Столбчатая диаграмма"
+    :return: None
+    """
+    await callback.message.answer('Введите начало периода в формате: год-месяц-день\nПример: 2025-01-01', reply_markup=kb.create_back_main_menu_kb())
+    await callback.message.delete()
+    await state.set_state(States.start_period_visual_circle)
+    await callback.answer()
 
 
+@router.message(StateFilter(States.start_period_visual_circle), F.text)
+async def input_start_period_visual_circle_handler(message: types.Message, state: FSMContext) -> None:
+    """
+    Обрабатывает сообщение пользователя (ввод старта периода), записывает данные в стейт, меняет стейт на новый
+    :param message: Принимает сообщение пользователя
+    :param state: Принимает состояние
+    :return: None
+    """
+    if pd.validate_date_format(message.text):
+        await state.update_data(user_id=message.from_user.id, start_date=message.text)
+        await message.answer('Введите окончание периода', reply_markup=kb.create_back_main_menu_kb())
+        await state.set_state(States.end_period_visual_circle)
+    else:
+        await message.answer('Не корректный ввод даты')
 
 
+@router.message(StateFilter(States.end_period_visual_circle), F.text)
+async def input_end_period_visual_circle_handler(message: types.Message, state: FSMContext) -> None:
+    """
+    Обрабатывает сообщение пользователя (ввод старта периода), записывает данные в стейт, меняет стейт на новый
+    :param message: Принимает сообщение пользователя
+    :param state: Принимает состояние
+    :return: None
+    """
+    if pd.validate_date_format(message.text):
 
+        await message.answer('Структура расходов и доходов по категориям\nДоходы:')
+        await state.update_data(end_date=message.text)
+        data = await state.get_data()
+
+        if stat.get_struct_income(data):
+            vd.create_circle_diagram_income(data)
+            await message.answer_photo(photo=types.FSInputFile(sld.get_graphs_income_circle_path()))
+            sld.del_file(sld.get_graphs_income_circle_path())
+        else:
+            await message.answer('Записи о доходах отсутствуют')
+
+        await message.answer('Расходы:')
+
+        if stat.get_struct_expense(data):
+            vd.create_circle_diagram_expense(data)
+            await message.answer_photo(photo=types.FSInputFile(sld.get_graphs_expense_circle_path()), reply_markup=kb.create_main_menu_kb())
+            sld.del_file(sld.get_graphs_expense_circle_path())
+            await state.clear()
+        else:
+            await message.answer('Записи о расходах отсутствуют', reply_markup=kb.create_main_menu_kb())
+            await state.clear()
+    else:
+        await message.answer('Не корректный ввод даты')
 
 
 @router.callback_query(StateFilter(None), F.data == 'cost_categories')

@@ -223,7 +223,7 @@ class CreateKeyboard:
         builder = InlineKeyboardBuilder()
 
         builder.button(text='Столбчатая диаграмма', callback_data='column')
-        builder.button(text='Круговая диаграмма', callback_data='circular')
+        builder.button(text='Круговая диаграмма', callback_data='circle')
 
         builder.adjust(1)
 

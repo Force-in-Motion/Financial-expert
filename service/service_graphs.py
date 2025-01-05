@@ -75,3 +75,55 @@ class VisualData:
             plt.close()
 
         return False
+
+
+    def create_circle_diagram_income(self, value):
+        """
+        Создает столбчатую диаграмму на основе полученных данных из базы данных
+        :param value: Принимает стартовую дату, дату окончания, user_id
+        :return: файл с диаграммой
+        """
+        categories = []
+        quantity = []
+
+        expense = self.__transaction.get_data_transactions_income(value)
+        if expense:
+            for row in expense:
+                categories.append(row[0])
+                quantity.append(row[1])
+
+            plt.figure(figsize=(10, 8))
+            plt.style.use('default')
+            plt.pie(quantity, labels=categories, autopct='%1.1f%%', startangle=90)
+            plt.axis('equal')
+            plt.title('Структура расходов по категориям')
+            plt.savefig(sld.get_graphs_income_circle_path(), dpi=100, bbox_inches='tight')
+            plt.close()
+
+        return False
+
+
+    def create_circle_diagram_expense(self, value):
+        """
+        Создает столбчатую диаграмму на основе полученных данных из базы данных
+        :param value: Принимает стартовую дату, дату окончания, user_id
+        :return: файл с диаграммой
+        """
+        categories = []
+        quantity = []
+
+        expense = self.__transaction.get_data_transactions_expense(value)
+        if expense:
+            for row in expense:
+                categories.append(row[0])
+                quantity.append(row[1])
+
+            plt.figure(figsize=(10, 8))
+            plt.style.use('default')
+            plt.pie(quantity, labels=categories, autopct='%1.1f%%', startangle=90)
+            plt.axis('equal')
+            plt.title('Структура расходов по категориям')
+            plt.savefig(sld.get_graphs_expense_circle_path(), dpi=100, bbox_inches='tight')
+            plt.close()
+
+        return False
