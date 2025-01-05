@@ -215,3 +215,16 @@ class CreateKeyboard:
         builder.adjust(1)
 
         return builder.as_markup(resize_keyboard=True)
+
+
+    @staticmethod
+    def create_diagram_kb():
+
+        builder = InlineKeyboardBuilder()
+
+        builder.button(text='Столбчатая диаграмма', callback_data='column')
+        builder.button(text='Круговая диаграмма', callback_data='circular')
+
+        builder.adjust(1)
+
+        return builder.as_markup(resize_keyboard=True)

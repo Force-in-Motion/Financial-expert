@@ -1,4 +1,4 @@
-from IPython.core.inputtransformer2 import MaybeAsyncCompile
+
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command, StateFilter
 from aiogram import Router, types
@@ -8,9 +8,12 @@ from model.states import States
 from model.logic_statistic import Statistic
 from keyboards.keyboards import CreateKeyboard as kb
 from utilits.processing_data import ProcessingData as pd
+from service.service_data import SaveLoadData as sld
+from service.logic_graphs import VisualData
 
 router = Router()
 stat = Statistic()
+vd = VisualData()
 
 
 @router.message(F.text.lower() == 'статистика')
@@ -202,20 +205,19 @@ async def struct_by_category_callback_handler(callback: types.CallbackQuery) -> 
 
 
 @router.callback_query(StateFilter(None), F.data == 'text_content')
-async def struct_by_category_callback_handler(callback: types.CallbackQuery, state: FSMContext) -> None:
+async def text_struct_by_category_callback_handler(callback: types.CallbackQuery, state: FSMContext) -> None:
     """
     Обрабатывает клик по кнопке "Текстовое представление"
     :return: None
     """
     await callback.message.answer('Введите начало периода в формате: год-месяц-день\nПример: 2025-01-01', reply_markup=kb.create_back_main_menu_kb())
     await callback.message.delete()
-    await state.set_state(States.start_period_struct_by_category)
+    await state.set_state(States.start_period_struct_by_category_text)
     await callback.answer()
 
-# visual_content
 
-@router.message(StateFilter(States.start_period_struct_by_category), F.text)
-async def input_start_period_struct_by_category_handler(message: types.Message, state: FSMContext) -> None:
+@router.message(StateFilter(States.start_period_struct_by_category_text), F.text)
+async def input_start_period_struct_by_category_text_handler(message: types.Message, state: FSMContext) -> None:
     """
     Обрабатывает сообщение пользователя (ввод старта периода), записывает данные в стейт, меняет стейт на новый
     :param message: Принимает сообщение пользователя
@@ -225,13 +227,13 @@ async def input_start_period_struct_by_category_handler(message: types.Message, 
     if pd.validate_date_format(message.text):
         await state.update_data(user_id=message.from_user.id, start_date=message.text)
         await message.answer('Введите окончание периода', reply_markup=kb.create_back_main_menu_kb())
-        await state.set_state(States.end_period_struct_by_category)
+        await state.set_state(States.end_period_struct_by_category_text)
     else:
         await message.answer('Не корректный ввод даты')
 
 
-@router.message(StateFilter(States.end_period_struct_by_category), F.text)
-async def input_end_period_struct_by_category_handler(message: types.Message, state: FSMContext) -> None:
+@router.message(StateFilter(States.end_period_struct_by_category_text), F.text)
+async def input_end_period_struct_by_category_text_handler(message: types.Message, state: FSMContext) -> None:
     """
     Обрабатывает сообщение пользователя (ввод окончания периода), записывает данные в стейт, меняет стейт на новый,
     вызывает методы, запрашивающие данные в базе, производит вычисления и отправляет пользователю
@@ -239,33 +241,118 @@ async def input_end_period_struct_by_category_handler(message: types.Message, st
     :param state: Принимает состояние
     :return: None
     """
+    if pd.validate_date_format(message.text):
 
-    await message.answer('Структура расходов и доходов по категориям\nДоходы:')
-    await state.update_data(end_date=message.text)
-    data = await state.get_data()
+        await message.answer('Структура расходов и доходов по категориям\nДоходы:')
+        await state.update_data(end_date=message.text)
+        data = await state.get_data()
 
-    income = stat.get_struct_income(data)
-    expense = stat.get_struct_expense(data)
+        income = stat.get_struct_income(data)
+        expense = stat.get_struct_expense(data)
 
-    sum_income = stat.get_sum_income(data)
-    sum_expense = stat.get_sum_expense(data)
+        sum_income = stat.get_sum_income(data)
+        sum_expense = stat.get_sum_expense(data)
 
-    if income and sum_income:
-        for row in income:
-            await message.answer(f'{row[0]}: {row[1] / sum_income * 100:.2f}%  от общих доходов, сумма: {row[1]}')
+        if income and sum_income:
+            for row in income:
+                await message.answer(f'{row[0]}: {row[1] / sum_income * 100:.2f}%  от общих доходов, сумма: {row[1]}')
+        else:
+            await message.answer('Записи о доходах отсутствуют')
+
+        await message.answer('Расходы:')
+
+        if expense and sum_expense:
+            for row in expense:
+                await message.answer(f'{row[0]}: {row[1] / sum_expense * 100:.2f}%  от общих расходов, сумма: {row[1]}', reply_markup=kb.create_main_menu_kb())
+            await state.clear()
+
+        else:
+            await message.answer('Записи о расходах отсутствуют', reply_markup=kb.create_main_menu_kb())
+            await state.clear()
+
     else:
-        await message.answer('Записи о доходах отсутствуют')
+        await message.answer('Не корректный ввод даты')
 
-    await message.answer('Расходы:')
 
-    if expense and sum_expense:
-        for row in expense:
-            await message.answer(f'{row[0]}: {row[1] / sum_expense * 100:.2f}%  от общих расходов, сумма: {row[1]}', reply_markup=kb.create_main_menu_kb())
-        await state.clear()
+@router.callback_query(F.data == 'visual_content')
+async def option_visual_struct_by_category_callback_handler(callback: types.CallbackQuery) -> None:
+    """
+    Обрабатывает клик по кнопке "Графическое представление'"
+    :return: None
+    """
+    await callback.message.answer('Выберите вариант диаграммы', reply_markup=kb.create_diagram_kb())
+    await callback.message.delete()
+    await callback.answer()
 
+
+@router.callback_query(StateFilter(None), F.data == 'column')
+async def visual_struct_by_category_callback_handler(callback: types.CallbackQuery, state: FSMContext) -> None:
+    """
+    Обрабатывает клик по кнопке "Столбчатая диаграмма"
+    :return: None
+    """
+    await callback.message.answer('Введите начало периода в формате: год-месяц-день\nПример: 2025-01-01', reply_markup=kb.create_back_main_menu_kb())
+    await callback.message.delete()
+    await state.set_state(States.start_period_struct_by_category_view_column)
+    await callback.answer()
+
+
+@router.message(StateFilter(States.start_period_struct_by_category_view_column), F.text)
+async def input_start_period_struct_by_category_visual_handler(message: types.Message, state: FSMContext) -> None:
+    """
+    Обрабатывает сообщение пользователя (ввод старта периода), записывает данные в стейт, меняет стейт на новый
+    :param message: Принимает сообщение пользователя
+    :param state: Принимает состояние
+    :return: None
+    """
+    if pd.validate_date_format(message.text):
+        await state.update_data(user_id=message.from_user.id, start_date=message.text)
+        await message.answer('Введите окончание периода', reply_markup=kb.create_back_main_menu_kb())
+        await state.set_state(States.end_period_struct_by_category_view_column)
     else:
-        await message.answer('Записи о расходах отсутствуют', reply_markup=kb.create_main_menu_kb())
-        await state.clear()
+        await message.answer('Не корректный ввод даты')
+
+
+@router.message(StateFilter(States.end_period_struct_by_category_view_column), F.text)
+async def input_start_period_struct_by_category_visual_handler(message: types.Message, state: FSMContext) -> None:
+    """
+    Обрабатывает сообщение пользователя (ввод старта периода), записывает данные в стейт, меняет стейт на новый
+    :param message: Принимает сообщение пользователя
+    :param state: Принимает состояние
+    :return: None
+    """
+    if pd.validate_date_format(message.text):
+
+        await message.answer('Структура расходов и доходов по категориям\nДоходы:')
+        await state.update_data(end_date=message.text)
+        data = await state.get_data()
+
+        if stat.get_struct_income(data):
+            vd.create_column_diagram_income(data)
+            await message.answer_photo(photo=types.FSInputFile(sld.get_graphs_income_column_path()))
+            sld.del_file(sld.get_graphs_income_column_path())
+        else:
+            await message.answer('Записи о доходах отсутствуют')
+
+        await message.answer('Расходы:')
+
+        if stat.get_struct_expense(data):
+            vd.create_column_diagram_expense(data)
+            await message.answer_photo(photo=types.FSInputFile(sld.get_graphs_expense_column_path()), reply_markup=kb.create_main_menu_kb())
+            sld.del_file(sld.get_graphs_expense_column_path())
+            await state.clear()
+        else:
+            await message.answer('Записи о расходах отсутствуют', reply_markup=kb.create_main_menu_kb())
+            await state.clear()
+    else:
+        await message.answer('Не корректный ввод даты')
+
+
+
+
+
+
+
 
 
 @router.callback_query(StateFilter(None), F.data == 'cost_categories')
@@ -305,21 +392,28 @@ async def input_end_period_cost_category_handler(message: types.Message, state: 
     :param state: Принимает состояние
     :return: None
     """
-    await message.answer('ТОП 5 затратных категорий:')
-    await state.update_data(end_date=message.text)
-    data = await state.get_data()
+    if pd.validate_date_format(message.text):
 
-    expense = stat.get_struct_expense(data)
-    sum_expense = stat.get_sum_expense(data)
+        await message.answer('ТОП 5 затратных категорий:')
+        await state.update_data(end_date=message.text)
+        data = await state.get_data()
 
-    if expense and sum_expense:
-        sorted_data = sorted(expense, key=lambda x: x[1], reverse=True)
+        expense = stat.get_struct_expense(data)
+        sum_expense = stat.get_sum_expense(data)
 
-        for index, row in enumerate(sorted_data):
-            if index >= 5: break
-            await message.answer(f'{row[0]}: его доля составляет {row[1] / sum_expense * 100:.2f}, а сумма: {row[1]}', reply_markup=kb.create_main_menu_kb())
+        if expense and sum_expense:
+            sorted_data = sorted(expense, key=lambda x: x[1], reverse=True)
+
+            for index, row in enumerate(sorted_data):
+                if index >= 5: break
+                await message.answer(f'{row[0]}: его доля составляет {row[1] / sum_expense * 100:.2f}, а сумма: {row[1]}', reply_markup=kb.create_main_menu_kb())
+                await state.clear()
+
+        else:
+            await message.answer('Записи о расходах отсутствуют', reply_markup=kb.create_main_menu_kb())
             await state.clear()
 
     else:
-        await message.answer('Записи о расходах отсутствуют', reply_markup=kb.create_main_menu_kb())
-        await state.clear()
+        await message.answer('Не корректный ввод даты')
+
+

@@ -1,5 +1,8 @@
+import io
 import os
 import json
+from PIL import Image
+from aiogram.types import InputFile
 
 
 class SaveLoadData:
@@ -27,6 +30,65 @@ class SaveLoadData:
         path_db = os.path.join(current_dir, '..', 'storage', 'database.db')
 
         return os.path.abspath(path_db)
+
+
+    @staticmethod
+    def get_graphs_income_column_path() -> str:
+        """
+        Создает относительный путь к файлу с заданным именем
+        :return: Путь в виде строки
+        """
+        current_dir = os.path.dirname(__file__)
+        path_file = os.path.join(current_dir, '..', 'media', 'column_income.png')
+
+        return os.path.abspath(path_file)
+
+
+    @staticmethod
+    def get_graphs_expense_column_path() -> str:
+        """
+        Создает относительный путь к файлу с заданным именем
+        :return: Путь в виде строки
+        """
+        current_dir = os.path.dirname(__file__)
+        path_file = os.path.join(current_dir, '..', 'media', 'column_expense.png')
+
+        return os.path.abspath(path_file)
+
+
+    @staticmethod
+    def get_graphs_income_circle_path() -> str:
+        """
+        Создает относительный путь к файлу с заданным именем
+        :return: Путь в виде строки
+        """
+        current_dir = os.path.dirname(__file__)
+        path_file = os.path.join(current_dir, '..', 'media', 'circle_income.png')
+
+        return os.path.abspath(path_file)
+
+
+    @staticmethod
+    def get_graphs_expense_circle_path() -> str:
+        """
+        Создает относительный путь к файлу с заданным именем
+        :return: Путь в виде строки
+        """
+        current_dir = os.path.dirname(__file__)
+        path_file = os.path.join(current_dir, '..', 'media', 'circle_expense.png')
+
+        return os.path.abspath(path_file)
+
+
+    @staticmethod
+    def del_file(path) -> None:
+        """
+        Удаляет файл по полученному пути
+        :param path: Принимает путь
+        :return: None
+        """
+        if os.path.exists(path):
+            os.remove(path)
 
 
     @staticmethod
