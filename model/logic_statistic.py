@@ -1,4 +1,4 @@
-import sqlite3
+
 from model.logic_transactions import Transactions
 
 
