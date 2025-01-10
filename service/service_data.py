@@ -1,8 +1,7 @@
-import io
+
 import os
 import json
-from PIL import Image
-from aiogram.types import InputFile
+
 
 
 class SaveLoadData:

@@ -4,7 +4,9 @@ from aiogram.fsm.state import StatesGroup, State
 
 
 class States(StatesGroup):
-
+    """
+    Содержит состояния
+    """
     add_username = State()
     add_password = State()
 
@@ -25,8 +27,8 @@ class States(StatesGroup):
     quantity_expense = State()
     category_expense = State()
 
-    description = State()
-    required = State()
+    add_description_goal = State()
+    add_required_goal = State()
 
     one_goal_menu = State()
     add_deposit = State()
@@ -34,7 +36,7 @@ class States(StatesGroup):
     start_period_transactions = State()
     end_period_transactions = State()
 
-    category = State()
+    search_transaction_by_category = State()
 
     start_period_result = State()
     end_period_result = State()

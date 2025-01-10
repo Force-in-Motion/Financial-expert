@@ -1,4 +1,4 @@
-from IPython.core.inputtransformer2 import MaybeAsyncCompile
+
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command, StateFilter
 from aiogram import Router, types
@@ -96,11 +96,11 @@ async def transactions_by_category_callback_handler(callback: types.CallbackQuer
     """
     await callback.message.answer('Введите категорию для поиска транзакций', reply_markup=kb.create_back_main_menu_kb())
     await callback.message.delete()
-    await state.set_state(States.category)
+    await state.set_state(States.search_transaction_by_category)
     await callback.answer()
 
 
-@router.message(StateFilter(States.category), F.text)
+@router.message(StateFilter(States.search_transaction_by_category), F.text)
 async def input_category_handler(message: types.Message, state: FSMContext) -> None:
     """
     Обрабатывает сообщение пользователя (ввод категории), записывает данные в стейт, меняет стейт на новый

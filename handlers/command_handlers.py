@@ -35,5 +35,6 @@ async def main_menu_callback_handler(callback: types.CallbackQuery, state: FSMCo
     :return: None
     """
     await state.clear()
+    await callback.message.delete()
     await callback.message.answer(f'Вы возвращены в главное меню, выберите команду\n\n {pd.mess_menu}', reply_markup=kb.create_main_menu_kb())
     await callback.answer()

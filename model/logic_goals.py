@@ -29,6 +29,8 @@ class Goal:
         )
         """)
 
+        self.__connect.commit()
+
 
     def __create_table_goal(self) -> None:
         """
@@ -46,6 +48,9 @@ class Goal:
         FOREIGN KEY (user_id) REFERENCES Users (user_id)
         )
         """)
+
+        self.__connect.commit()
+
 
     def add_goal(self, value) -> None:
         """

@@ -206,7 +206,10 @@ class CreateKeyboard:
 
     @staticmethod
     def create_options_struct_output_kb():
-
+        """
+        Создает клавиатуру, которая определяет меню возможностей Текстовое представление или Графического статистики
+        :return: Клавиатуру
+        """
         builder = InlineKeyboardBuilder()
 
         builder.button(text='Текстовое представление', callback_data='text_content')
@@ -219,7 +222,10 @@ class CreateKeyboard:
 
     @staticmethod
     def create_diagram_kb():
-
+        """
+        Создает клавиатуру, которая определяет меню возможностей показа столбчатой или круговой диаграммы статистики
+        :return: Клавиатуру
+        """
         builder = InlineKeyboardBuilder()
 
         builder.button(text='Столбчатая диаграмма', callback_data='column')

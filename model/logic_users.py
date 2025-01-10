@@ -26,6 +26,9 @@ class Users:
             )
             """)
 
+        self.__connect.commit()
+
+
     def add_user(self, value) -> None:
         """
         Добавляет пользователя в базу данных

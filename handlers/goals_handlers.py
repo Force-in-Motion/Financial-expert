@@ -31,12 +31,12 @@ async def add_goal_callback_handler(callback: types.CallbackQuery, state: FSMCon
     :return: None
     """
     await callback.message.answer('Введите короткое описание цели, например: На отпуск')
-    await state.set_state(States.description)
+    await state.set_state(States.add_description_goal)
     await callback.message.delete()
     await callback.answer()
 
 
-@router.message(StateFilter(States.description), F.text)
+@router.message(StateFilter(States.add_description_goal), F.text)
 async def input_description_goal_handler(message: types.Message, state: FSMContext) -> None:
     """
     Обрабатывает полученное сообщение пользователя, записывает в стейт и меняет стейт на новый
@@ -46,10 +46,10 @@ async def input_description_goal_handler(message: types.Message, state: FSMConte
     """
     await state.update_data(description=message.text, user_id=message.from_user.id)
     await message.answer('Введите сумму для депозита')
-    await state.set_state(States.required)
+    await state.set_state(States.add_required_goal)
 
 
-@router.message(StateFilter(States.required), F.text)
+@router.message(StateFilter(States.add_required_goal), F.text)
 async def input_deposit_goal_handler(message: types.Message, state: FSMContext) -> None:
     """
     Обрабатывает полученное сообщение пользователя, записывает в стейт и затем извлекает из стейта
@@ -192,6 +192,10 @@ async def active_goals_callback_handler(callback: types.CallbackQuery) -> None:
 
 @router.callback_query(F.data == 'finished')
 async def finished_goals_callback_handler(callback: types.CallbackQuery) -> None:
+    """
+    Обрабатывает клик по кнопке "Завершенные цели"
+    :return: None
+    """
     user_id = callback.from_user.id
     await callback.message.answer(text='Статистика завершенных целей')
     await callback.message.delete()
