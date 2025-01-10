@@ -122,7 +122,7 @@ async def edit_user_name_callback_handler(callback: types.CallbackQuery, state: 
     Обрабатывает клик по кнопке "Редактировать имя"
     :return: None
     """
-    await callback.message.answer('Введите старое имя пользователя')
+    await callback.message.answer('Введите старое имя пользователя', reply_markup=kb.create_back_main_menu_kb())
     await callback.message.delete()
     await state.set_state(States.old_username)
     await callback.answer()
@@ -139,10 +139,10 @@ async def input_old_user_name_handler(message: types.Message, state: FSMContext)
     await state.update_data(user_id=message.from_user.id)
     if users.get_user_name(message.text, message.from_user.id):
         await state.update_data(oldname=message.text)
-        await message.answer('Введите новое имя пользователя')
+        await message.answer('Введите новое имя пользователя', reply_markup=kb.create_back_main_menu_kb())
         await state.set_state(States.new_username)
     else:
-        await message.answer('Такого имени пользователя нет в базе, введите другое')
+        await message.answer('Такого имени пользователя нет в базе, введите другое', reply_markup=kb.create_back_main_menu_kb())
 
 
 @router.message(StateFilter(States.new_username), F.text)
@@ -157,10 +157,10 @@ async def input_new_user_name_handler(message: types.Message, state: FSMContext)
         await state.update_data(newname=message.text)
         data = await state.get_data()
         users.edit_user_name(data)
-        await message.answer('Имя пользователя успешно изменено', reply_markup=kb.create_main_menu_kb())
+        await message.answer('Имя пользователя успешно изменено')
         await state.clear()
     else:
-        await message.answer('Такое имя пользователя уже занято, выберите другое')
+        await message.answer('Такое имя пользователя уже занято, выберите другое', reply_markup=kb.create_back_main_menu_kb())
 
 
 @router.callback_query(StateFilter(None), F.data == 'password')
@@ -169,7 +169,7 @@ async def edit_user_password_callback_handler(callback: types.CallbackQuery, sta
     Обрабатывает клик по кнопке "Редактировать пароль"
     :return: None
     """
-    await callback.message.answer('Введите старый пароль')
+    await callback.message.answer('Введите старый пароль', reply_markup=kb.create_back_main_menu_kb())
     await callback.message.delete()
     await state.set_state(States.old_password)
     await callback.answer()
@@ -186,10 +186,10 @@ async def input_old_password_handler(message: types.Message, state: FSMContext) 
     await state.update_data(user_id=message.from_user.id)
     if users.get_user_password(message.text, message.from_user.id):
         await state.update_data(oldpassword=message.text)
-        await message.answer('Введите новый пароль')
+        await message.answer('Введите новый пароль', reply_markup=kb.create_back_main_menu_kb())
         await state.set_state(States.new_password)
     else:
-        await message.answer('Такого пароля нет в базе, введите другой')
+        await message.answer('Такого пароля нет в базе, введите другой', reply_markup=kb.create_back_main_menu_kb())
 
 
 @router.message(StateFilter(States.new_password), F.text)
@@ -212,7 +212,7 @@ async def del_user_callback_handler(callback: types.CallbackQuery, state: FSMCon
     Обрабатывает клик по кнопке "Удалить пользователя"
     :return: None
     """
-    await callback.message.answer('Введите имя пользователя для удаления')
+    await callback.message.answer('Введите имя пользователя для удаления', reply_markup=kb.create_back_main_menu_kb())
     await callback.message.delete()
     await state.set_state(States.del_user)
     await callback.answer()
@@ -234,4 +234,4 @@ async def input_del_user_handler(message: types.Message, state: FSMContext) -> N
         await message.answer('Пользователь успешно удален', reply_markup=kb.create_main_menu_kb())
         await state.clear()
     else:
-        await message.answer('Такого пользователя нет в базе, укажите другое имя')
+        await message.answer('Такого пользователя нет в базе, укажите другое имя', reply_markup=kb.create_back_main_menu_kb())

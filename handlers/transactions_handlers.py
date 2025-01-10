@@ -51,7 +51,7 @@ async def input_start_period_handler(message: types.Message, state: FSMContext) 
         await message.answer('Введите окончание периода', reply_markup=kb.create_back_main_menu_kb())
         await state.set_state(States.end_period_transactions)
     else:
-        await message.answer('Не корректный ввод даты')
+        await message.answer('Не корректный ввод даты', reply_markup=kb.create_back_main_menu_kb())
 
 
 @router.message(StateFilter(States.end_period_transactions), F.text)
@@ -86,7 +86,7 @@ async def input_end_period_handler(message: types.Message, state: FSMContext) ->
             await message.answer('За указанный период расхода не было', reply_markup=kb.create_main_menu_kb())
             await state.clear()
     else:
-        await message.answer('Не корректный ввод даты')
+        await message.answer('Не корректный ввод даты', reply_markup=kb.create_back_main_menu_kb())
 
 @router.callback_query(StateFilter(None), F.data == 'category')
 async def transactions_by_category_callback_handler(callback: types.CallbackQuery, state: FSMContext) -> None:
@@ -156,7 +156,7 @@ async def input_start_period_result_handler(message: types.Message, state: FSMCo
         await message.answer('Введите окончание периода', reply_markup=kb.create_back_main_menu_kb())
         await state.set_state(States.end_period_result)
     else:
-        await message.answer('Не корректный ввод даты')
+        await message.answer('Не корректный ввод даты', reply_markup=kb.create_back_main_menu_kb())
 
 
 @router.message(StateFilter(States.end_period_result), F.text)
@@ -187,7 +187,7 @@ async def input_start_period_result_handler(message: types.Message, state: FSMCo
             await message.answer('За указанный период расхода не было', reply_markup=kb.create_main_menu_kb())
             await state.clear()
     else:
-        await message.answer('Не корректный ввод даты')
+        await message.answer('Не корректный ввод даты', reply_markup=kb.create_back_main_menu_kb())
 
 
 

@@ -21,7 +21,8 @@ async def input_quantity_income_handler(message: types.Message, state: FSMContex
     :param state: Состояние, находясь в котором бот реагирует на команду пользователя
     :return: None
     """
-    await message.answer('Введите сумму своего дохода', reply_markup=types.ReplyKeyboardRemove())
+    await message.answer('Раздел ваших доходов', reply_markup=types.ReplyKeyboardRemove())
+    await message.answer('Введите сумму своего дохода', reply_markup=kb.create_back_main_menu_kb())
     await state.set_state(States.quantity_income)
     await state.update_data(user_id=message.from_user.id)
 
@@ -36,7 +37,7 @@ async def input_category_income_handler(message: types.Message, state: FSMContex
     """
     if message.text.isdigit():
         await state.update_data(quantity=message.text)
-        await message.answer('Введите название категории')
+        await message.answer('Введите название категории', reply_markup=kb.create_back_main_menu_kb())
         await state.set_state(States.category_income)
     else:
         await message.reply('Введите число!')
@@ -69,7 +70,8 @@ async def input_quantity_expense_handler(message: types.Message, state: FSMConte
     :param state: Состояние, находясь в котором бот реагирует на команду пользователя
     :return: None
     """
-    await message.answer('Введите сумму своего расхода', reply_markup=types.ReplyKeyboardRemove())
+    await message.answer('Раздел ваших расходов', reply_markup=types.ReplyKeyboardRemove())
+    await message.answer('Введите сумму своего расхода', reply_markup=kb.create_back_main_menu_kb())
     await state.set_state(States.quantity_expense)
     await state.update_data(user_id=message.from_user.id)
 
@@ -84,7 +86,7 @@ async def input_category_expense_handler(message: types.Message, state: FSMConte
     """
     if message.text.isdigit():
         await state.update_data(quantity=message.text)
-        await message.answer('Введите название категории')
+        await message.answer('Введите название категории', reply_markup=kb.create_back_main_menu_kb())
         await state.set_state(States.category_expense)
     else:
         await message.reply('Введите число!')
@@ -105,16 +107,6 @@ async def creating_finished_record_expense_handler(message: types.Message, state
     await message.answer('Ваши данные успешно сохранены', reply_markup=kb.create_main_menu_kb())
     await state.clear()
 
-
-# @router.message()
-# async def input_error_handler(message: types.Message, state: FSMContext) -> None:
-#     """
-#     Обрабатывает полученное сообщение пользователя и сообщает об ошибке ввода если получен не текст
-#     :param message: Принимает текст сообщения, которое пользователь пишет в чат
-#     :param state: Состояние, находясь в котором бот реагирует на команду пользователя
-#     :return: None
-#     """
-#     await message.answer('Введите данные из предложенных!')
 
 
 

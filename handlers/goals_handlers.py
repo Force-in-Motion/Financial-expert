@@ -30,7 +30,7 @@ async def add_goal_callback_handler(callback: types.CallbackQuery, state: FSMCon
     Обрабатывает клик по кнопке 'Добавить цель'
     :return: None
     """
-    await callback.message.answer('Введите короткое описание цели, например: На отпуск')
+    await callback.message.answer('Введите короткое описание цели, например: На отпуск', reply_markup=kb.create_back_main_menu_kb())
     await state.set_state(States.add_description_goal)
     await callback.message.delete()
     await callback.answer()
@@ -45,7 +45,7 @@ async def input_description_goal_handler(message: types.Message, state: FSMConte
     :return: None
     """
     await state.update_data(description=message.text, user_id=message.from_user.id)
-    await message.answer('Введите сумму для депозита')
+    await message.answer('Введите сумму для депозита', reply_markup=kb.create_back_main_menu_kb())
     await state.set_state(States.add_required_goal)
 
 
@@ -64,7 +64,7 @@ async def input_deposit_goal_handler(message: types.Message, state: FSMContext) 
         await message.answer('Цель успешно создана', reply_markup=kb.create_main_menu_kb())
         await state.clear()
     else:
-        await message.reply('Введите число!')
+        await message.reply('Введите число!', reply_markup=kb.create_back_main_menu_kb())
 
 
 @router.callback_query(F.data == 'my_goal')
@@ -89,7 +89,7 @@ async def list_goals_callback_handler(callback: types.CallbackQuery, state: FSMC
         await callback.message.answer('Список активных целей', reply_markup=kb.create_list_goals_kb(user_id))
         await state.set_state(States.one_goal_menu)
     else:
-        await callback.message.answer('Вы пока не добавили ни одну цель!')
+        await callback.message.answer('Вы пока не добавили ни одну цель!', reply_markup=kb.create_back_main_menu_kb())
     await callback.message.delete()
     await callback.answer()
 
@@ -114,7 +114,7 @@ async def add_deposit_goal_callback_handler(callback: types.CallbackQuery, state
     Обрабатывает клик по кнопке 'Добавить депозит'
     :return: None
     """
-    await callback.message.answer('Введите сумму депозита')
+    await callback.message.answer('Введите сумму депозита', reply_markup=kb.create_back_main_menu_kb())
     await state.set_state(States.add_deposit)
     await callback.message.delete()
     await callback.answer()
@@ -151,7 +151,7 @@ async def get_value_deposit_handler(message: types.Message, state: FSMContext) -
             goal.del_goal(data)
         await state.clear()
     else:
-        await message.reply('Введите числовое значение')
+        await message.reply('Введите числовое значение', reply_markup=kb.create_back_main_menu_kb())
 
 
 @router.callback_query(F.data == 'statistic_goal')
